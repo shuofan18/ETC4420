@@ -1,0 +1,34 @@
+	(1)
+VARIABLES	Linear regression model
+	
+age3039	-0.00334
+	(0.0140)
+age4049	0.00347
+	(0.0141)
+age5059	0.0354**
+	(0.0150)
+age6069	0.0881***
+	(0.0163)
+age70up	0.165***
+	(0.0162)
+male	-0.0759***
+	(0.00862)
+lnincome	-0.0285***
+	(0.00756)
+mcity	0.0345***
+	(0.00884)
+poor	0.422***
+	(0.0216)
+fair	0.279***
+	(0.0160)
+good	0.102***
+	(0.0128)
+verygood	0.0318***
+	(0.0123)
+Constant	0.342***
+	(0.0507)
+	
+Observations	16,828
+R-squared	0.074
+Standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	
