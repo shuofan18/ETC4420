@@ -1,5 +1,6 @@
 cd /Users/stanza/documents/github/etc4420
 use "gpvisits.dta", replace
+//Introduction and data cleaning.
 //We are interested in the impact of individual characteristics on GP visits.
 //First, we check the data by looking at the summary statistics. 
 sum
@@ -23,24 +24,51 @@ sum logincome
 //By comparing logincome with lnincome (which is ranging from 5.2983 to 7.3132), 
 //the lowest income (99) was found missing in lnincome. Given this, we will not
 //use lnincome in our following regressions, instead, we will use logincome.
-//Then we check the dependent variable
+//Then we check the dependent variable gpvisit.
+tab gpvisit
+proportion gpvisit
+//In 2004-05, 76.8% of individuals did not visit a GP, 19.22% visited once, 
+//3.2% visited twice and 0.9% visted 3 or more times.
+//With the data all clean, we are now ready to do the analysis.
+
+**********  Task A **********
 
 set seed 27886913
 sample 10000, count
-// 76.8%...........................(different with slides even before random selection)
-//Task A Question 2, (table 1 & 2 part 2), observed probability of count
+//Check if the sampling works as expected.
+sum
+//After sampling, we have 10000 observations, the data looks clean.
+//Check the dependent variable again after sampling.
+//Observed probability of count (Task A Question 2 table 1 & 2 part 2)
 tab gpvisit
 proportion gpvisit
-//Task A Question 1, estimate a linear regression model 
+//In this subset, in 2004-05, 76.3% of individuals did not visit a GP, 
+//19.52% visited once, 3.16% visited twice and 0.98% visted 3 or more times.
+//All numbers are similar to what we got from the whole sample.
 
-reg gpvisit age3039 age4049 age5059 age6069 age70up male lnincome/*
+//We will use gpvisit as our dependent variable; age, gender, income, living in 
+//cities or not, self-reported health as our independent variables.
+//First check relationship between income and GP visits by cross tabulation and 
+//histgram since we want to treat log(income) as continuous.
+bysort gpvisit: tab logincome
+histogram logincome, percent by (gpvisit)
+graph export histogram.png
+//From the tabulation and the four histogram, 
+//we can see the relationship between log(income) and GP visits is not linear. 
+//The visits increase with the first three income level, 
+//and then start to decrease from the third income level.
+//We will reproduce the tables in our slides first and then discuss the impact 
+//of this nonlinearity afterwards.
+
+//Task A Question 1, estimate a linear regression model 
+reg gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
 */ mcity poor fair good verygood
 outreg2 using linear.xls, replace title(Linear regression model)/*
 */ sideway stats(coef se tstat pval ci) bdec(3) 
 
 //Task A question 1, estimate poisson regression model 
 
-poisson gpvisit age3039 age4049 age5059 age6069 age70up male lnincome/*
+poisson gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
 */ mcity poor fair good verygood
 outreg2 using poisson.xls, replace title(poisson regression) sideway/*
 */ stats(coef se tstat pval) bdec(3)
@@ -56,7 +84,7 @@ prcounts p_visits, max(3)
 sum p_visitspr0 p_visitspr1 p_visitspr2 p_visitspr3
 
 //Task A, estimate negative binomial model ******** weird alpha***********
-nbreg gpvisit age3039 age4049 age5059 age6069 age70up male lnincome mcity poor/*
+nbreg gpvisit age3039 age4049 age5059 age6069 age70up male logincome mcity poor/*
 */ fair good verygood
 outreg2 using ngbinom.xls, replace title(negative binomial regression) sideway/*
 */ stats(coef se tstat pval) bdec(3)
