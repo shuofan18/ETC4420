@@ -1,7 +1,32 @@
-cd \\ad.monash.edu\home\User079\szha0076\desktop
+cd /Users/stanza/documents/github/etc4420
 use "gpvisits.dta", replace
-//set seed 27886913
-//sample 10000, count
+//We are interested in the impact of individual characteristics on GP visits.
+//First, we check the data by looking at the summary statistics. 
+sum
+//In this dataset, we have information relating household income, age, gender,
+//living in cities or not, self-reported health, and number of times consulted 
+//GP in the last few weeks.
+//All variables are discrete or dummy variables except 'income' and 'lnincome'.
+//All variables have 19501 observations except 'lnincome'(which has only 16828)
+//So check if 'income' looks normal. 
+tab income
+sum income
+//All values associated with income are positive, no zero values are detected.
+//Generate a new variable named logincome and label it as log(income).
+gen logincome=log(income)
+lab var logincome "log(income)"
+//Check if the new log(income) has any missing values.
+tab logincome
+sum logincome
+//There is no missing values in the new log(income). 
+//And logincome is ranging from 4.5951 to 7.3132.
+//By comparing logincome with lnincome (which is ranging from 5.2983 to 7.3132), 
+//the lowest income (99) was found missing in lnincome. Given this, we will not
+//use lnincome in our following regressions, instead, we will use logincome.
+//Then we check the dependent variable
+
+set seed 27886913
+sample 10000, count
 // 76.8%...........................(different with slides even before random selection)
 //Task A Question 2, (table 1 & 2 part 2), observed probability of count
 tab gpvisit
@@ -30,7 +55,7 @@ sum gpvisit p_gpvisit
 prcounts p_visits, max(3)
 sum p_visitspr0 p_visitspr1 p_visitspr2 p_visitspr3
 
-//Task A, estimate negative binomial model
+//Task A, estimate negative binomial model ******** weird alpha***********
 nbreg gpvisit age3039 age4049 age5059 age6069 age70up male lnincome mcity poor/*
 */ fair good verygood
 outreg2 using ngbinom.xls, replace title(negative binomial regression) sideway/*
@@ -47,10 +72,10 @@ prcounts nb_visits, max(3)
 sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
 
 *********************************Task B************************************** 
-cd \\ad.monash.edu\home\User079\szha0076\desktop
+cd /Users/stanza/documents/github/etc4420
 use "SS hilda.dta", replace
-//set seed 27886913
-//sample 12000, count
+set seed 27886913
+sample 12000, count
 //Task B question 1, generate a binary variable "working"
 gen working=1 if wscei>0
 replace working=0 if wscei<=0
@@ -59,18 +84,18 @@ replace working=0 if wscei<=0
 heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
 */ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
 */ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
-*/bachabv dipcert year12) twostep
+*/bachabv dipcert year12 married depkid) twostep
 //Task B question 1, estimate a Heckman sample selection model using MLE
 heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
 */ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
 */ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
-*/bachabv dipcert year12)
+*/bachabv dipcert year12 married depkid)
 
 //Task B question 2, marginal effects of E(y)
 margins, dydx(*) atmean
 /***** marginal effects of E(y|z=1) ***/
 margins, dydx(*) predict(ycond) atmean
-tab
+
 
 
 
