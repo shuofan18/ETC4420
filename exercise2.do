@@ -1,3 +1,6 @@
+
+**********  Task A **********  Data **********
+
 cd /Users/stanza/documents/github/etc4420
 use "gpvisits.dta", replace
 //Introduction and data cleaning.
@@ -31,7 +34,7 @@ proportion gpvisit
 //3.2% visited twice and 0.9% visted 3 or more times.
 //With the data all clean, we are now ready to do the analysis.
 
-**********  Task A **********
+**********  Task A **********  Questions **********
 
 set seed 27886913
 sample 10000, count
@@ -117,6 +120,7 @@ sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
 
 //Task A Question 3
 //Compare my results to those in lecture slides.
+
 //First for the regression results.
 //Variables named 'age3039, age4049, age5059, logincome, verygood' are all
 //insignificant at 10% significance level in my results for all three models, 
@@ -124,7 +128,7 @@ sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
 //I think this is mainly due to two reasons. The first one is the randomness 
 //caused by the sampling. We use a subset of the whole dataset, so it is 
 //reasonable to have slightly different results. 
-//The second one, which is also more important, is related to the fact that 
+//The second one, which is more important, is related to the fact that the
 //'logincome' is not linearly correlated with 'GP visits'. To reproduce the
 //output, we put the 'logincome' into all models without adjustment. However, 
 //the main information of the impact of 'logincome' was all left in the
@@ -140,19 +144,82 @@ sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
 //results and the ones in slides. So while all my regressions estimate a 
 //positive effect of log(income) on GP visits, all models in lecture notes 
 //estimate them as nagetive. 
-//In regard to others estimations in all three regression and marginal effects
-//of Poisson and Negative Binomial are very similar.
+//As for estimated coefficients of 'gender', 'living in cities or not' and 
+//'self-reported health' are all similar between my results and slides for all
+//three models. This is probably because these factors are not as strongly 
+//correlated with income as age. Their estimated marginal effects for Poisson 
+//and Negative Binomial from my results are very similar to slides too.
 
-*********************************Task B************************************** 
+//To deal with the non-linearity of log(income), I think we can use dummy 
+//variables for different income level instead of treating it as continous.
+
+**********  Task B **********  Data ********** 
+
 cd /Users/stanza/documents/github/etc4420
 use "SS hilda.dta", replace
-set seed 27886913
-sample 12000, count
-//Task B question 1, generate a binary variable "working"
+
+//Introduction and data cleaning.
+//We are insterested in the factors determining the weekly wage for the whole 
+//Australian population, using the wage data of those who are currently working.
+//First, we check the data by looking at the summary statistics. 
+sum
+///In this dataset, we have variables relating personal earnings, age, gender,
+//current employment status, eduction level, number of dependent children,
+//having concenssion card or not, self-reported health, and marital status.
+
+//All variables are discrete or dummy variables except income related variables.
+
+//There are a lot of missing values in logincome, which is caused by the zero
+//in disposable income. There are also missing values in 'lfp' because many
+//people did not respond to the employment status question in the survey. Same 
+//with 'esempst' which is a more detailed employment status variable, 'scage'
+//which indicating age group,  'male', 'edhigh' which is the highest education 
+//level, 'concession' and 'married'.
+ 
+//Since we want to study the weekly wage, we will use 'wscei' as our dependent 
+//variable. Also we want to keep as many observations as we could, 
+//so we will not use any employment status related variables in this dataset 
+//directly. Instead, we will generate a new dummy variable called 'working' 
+//indicating if a person is working or not given the value of his/her 'wscei'
+//as our selection variable.
+//We will also use 'male', detailed 'age' band variables (the youngest group is
+//the reference level), and four 'education' levels (less than year 12 will be 
+//the reference) as the determinants for the outcome equation. Because age and
+//education are obviously have strong correlation with one's wage. And 
+//unfortunately, gender is assumed to still have some impact as well.
+//'Marital status' and 'dependent children' will be included in the selection 
+//equation as extra IVs. Because these two factors will definitely have impact
+//on one person's employment status but assumed to be irrelevant to one's wage.
+
 gen working=1 if wscei>0
 replace working=0 if wscei<=0
-//Task B question 1,
+lab var working "=1 for working people, =0 otherwise"
+
+//Check the new variable by looking at its summary statistics.
+tab working
+//In general, there are 8216 working people in this dataset, while 8216
+//non-working people. This 'working' variable may not be necessarily accurate
+//given the way we generated it. So we check the cross tabulation of it with 
+//other employment status variables.
+tab esbrd working
+//We can see there are some mismatch between the two, since some 'employee' 
+//indicated by 'esbrd' are grouped as 0 in 'working'. This may because some 
+//employees did not report the weekly wage. As far as our assignment concerned,
+//we will assume the working status are mostly correct specified and use it in 
+//our further analysis.
+
+**********  Task B **********  Questions ********** 
+
+set seed 27886913
+sample 12000, count
+
+//Check data again after sampling.
+sum
+//Random sampling works fine.
+
 //Estimate a Heckman sample selection model using Two-step Heckit Estimator
+//Task B question 1
+
 heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
 */ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
 */ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
