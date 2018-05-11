@@ -52,7 +52,7 @@ proportion gpvisit
 //histgram since we want to treat log(income) as continuous.
 bysort gpvisit: tab logincome
 histogram logincome, percent by (gpvisit)
-graph export histogram.png
+graph export histogram.png, replace
 //From the tabulation and the four histogram, 
 //we can see the relationship between log(income) and GP visits is not linear. 
 //The visits increase with the first three income level, 
@@ -60,44 +60,76 @@ graph export histogram.png
 //We will reproduce the tables in our slides first and then discuss the impact 
 //of this nonlinearity afterwards.
 
-//Task A Question 1, estimate a linear regression model 
+//Estimate a linear regression model (Task A Question 1)
+
 reg gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
 */ mcity poor fair good verygood
 outreg2 using linear.xls, replace title(Linear regression model)/*
 */ sideway stats(coef se tstat pval ci) bdec(3) 
 
-//Task A question 1, estimate poisson regression model 
+//Task A Question 3
+//Compare the linear regression results to those in page 17 in lecture slides.
+//First, variables named 'age3039, age4049, age5059, logincome, verygood' are
+//insignificant at 10% significance level in my results, while only 'age3039' 
+//and 'age4049' are insignificant in lecture notes at 10% significance level.
+//I think the reason for this is related to the fact that 'logincome' is not 
+//linearly correlated with 'GP visits'. Because we run linear regression on it
+//regardlessly, the main information of the impact of 'logincome' was left in  
+//residuals of the regression, which also caused the superficial insignificance
+//of the 'logincome' itself. What's more, people aged from 40 to 59 are often
+//the people who have the highest houldhold income, these variables are 
+//obviously correlated with the residuals. Therefore, it is likely that our 
+//estimation of age variables are biased and inconsistent as well. 
+
+//Estimate poisson regression model (Task A Question 1)
 
 poisson gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
 */ mcity poor fair good verygood
 outreg2 using poisson.xls, replace title(poisson regression) sideway/*
 */ stats(coef se tstat pval) bdec(3)
-//Task A question 1, estimate marginal effect of poisson model
+
+//Estimate marginal effect of Poisson model (Task A Question 1)
+
 margins, dydx(*)
 outreg2 using poisson.xls, append sideway stats(coef se tstat)
-//Task A question 2, (table 1 part 1), predict number of visits
+
+//Predict number of visits using Poisson model (Task A question 2 table 1 part 1)
+
 predict p_gpvisit, n
 sum gpvisit p_gpvisit
-//Task A question 2, (table 1 part 3), predicted probability of counts
+
+//Predicted probability of counts using Poisson model 
+//(Task A question 2 table 1 part 3)
 //(need to install st0002.pkg here)
+
 prcounts p_visits, max(3)
 sum p_visitspr0 p_visitspr1 p_visitspr2 p_visitspr3
 
-//Task A, estimate negative binomial model ******** weird alpha***********
+//Estimate Negative Binomial model (Task A Question 1)
+
 nbreg gpvisit age3039 age4049 age5059 age6069 age70up male logincome mcity poor/*
 */ fair good verygood
-outreg2 using ngbinom.xls, replace title(negative binomial regression) sideway/*
+outreg2 using ngbinom.xls, replace title(negative binomial model) sideway/*
 */ stats(coef se tstat pval) bdec(3)
-//estimate marginal effect of negative binomial model
+
+//Estimate marginal effect of Negative Binomial model (Task A Question 1)
+
 margins, dydx(*)
 outreg2 using ngbinom.xls, append sideway stats(coef se tstat)
-//Task A question 2, (table 2 part 1), predict number of visits
+
+//Predict number of visits using Negative Binomial model
+//(Task A question 2 table 2 part 1)
+
 predict nb_gpvisit, n
 sum gpvisit nb_gpvisit
-//Task A question 2, (table 2 part 3), predicted probability of counts
+
+//Predicted probability of counts (Task A question 2 table 2 part 3)
 //(need to install st0002.pkg here)
+
 prcounts nb_visits, max(3)
 sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
+
+//Compare my results to those in he lecture slides.
 
 *********************************Task B************************************** 
 cd /Users/stanza/documents/github/etc4420
