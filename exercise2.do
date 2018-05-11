@@ -67,20 +67,6 @@ reg gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
 outreg2 using linear.xls, replace title(Linear regression model)/*
 */ sideway stats(coef se tstat pval ci) bdec(3) 
 
-//Task A Question 3
-//Compare the linear regression results to those in page 17 in lecture slides.
-//First, variables named 'age3039, age4049, age5059, logincome, verygood' are
-//insignificant at 10% significance level in my results, while only 'age3039' 
-//and 'age4049' are insignificant in lecture notes at 10% significance level.
-//I think the reason for this is related to the fact that 'logincome' is not 
-//linearly correlated with 'GP visits'. Because we run linear regression on it
-//regardlessly, the main information of the impact of 'logincome' was left in  
-//residuals of the regression, which also caused the superficial insignificance
-//of the 'logincome' itself. What's more, people aged from 40 to 59 are often
-//the people who have the highest houldhold income, these variables are 
-//obviously correlated with the residuals. Therefore, it is likely that our 
-//estimation of age variables are biased and inconsistent as well. 
-
 //Estimate poisson regression model (Task A Question 1)
 
 poisson gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
@@ -129,7 +115,33 @@ sum gpvisit nb_gpvisit
 prcounts nb_visits, max(3)
 sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
 
-//Compare my results to those in he lecture slides.
+//Task A Question 3
+//Compare my results to those in lecture slides.
+//First for the regression results.
+//Variables named 'age3039, age4049, age5059, logincome, verygood' are all
+//insignificant at 10% significance level in my results for all three models, 
+//while only 'age3039' and 'age4049' are insignificant in lecture notes.
+//I think this is mainly due to two reasons. The first one is the randomness 
+//caused by the sampling. We use a subset of the whole dataset, so it is 
+//reasonable to have slightly different results. 
+//The second one, which is also more important, is related to the fact that 
+//'logincome' is not linearly correlated with 'GP visits'. To reproduce the
+//output, we put the 'logincome' into all models without adjustment. However, 
+//the main information of the impact of 'logincome' was all left in the
+//residuals of the regressions, which also caused the superficial insignificance
+//of the 'logincome' itself. What's more, people aged from 30 to 59 are often
+//the people who have the highest houldhold income, and people aged above or 
+//below often earn less, therefore these variables are obviously correlated with  
+//residuals. Hence, it is likely that our estimation of age variables are 
+//biased and inconsistent. Also, since lecture slides omitted the lowest income
+//level as discussed above, although its estimates are also biased and 
+//inconsistent, they are slightly different bias as mine.
+//Same reasoning applies to the difference between the sign and magnitude of my 
+//results and the ones in slides. So while all my regressions estimate a 
+//positive effect of log(income) on GP visits, all models in lecture notes 
+//estimate them as nagetive. 
+//In regard to others estimations in all three regression and marginal effects
+//of Poisson and Negative Binomial are very similar.
 
 *********************************Task B************************************** 
 cd /Users/stanza/documents/github/etc4420
