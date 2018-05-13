@@ -250,21 +250,39 @@ estimate store heckman_mle
 estimate table heckman_2step heckman_mle
 //As we can see, the estimated coefficients are very different for these two
 //methods in the outcome equation. I think the reason for that is what we 
-//mentioned above, 
+//mentioned above, the normal assumption is clearly violated in this case, 
+//so the estimated standard deviations are very large. Hence the estimates are
+//very sensitive to the change in estimating methods.
 
-//Estimate the marginal effects for E('wscei') and E('wscei'|working=1)based on 
+//What's more, we can see the estimated rho is negative. Intuitively, it is more
+//reasonable to be positive. The residuals in the outcome equation and the 
+//selection equation maybe positively correlted. Because the unobserved factors
+//that make people working are more likely to also make people earn more.
+//I think this may due to the lack of good IVs. Or it could be x variables take
+//too much information in residuals which over-compensated the issue. Or maybe
+//our dataset is not a good one.
+
+//Estimate the marginal effects for E('wscei') and E('wscei'|working=1) based on 
 //the MLE model above.
 //Task B Question 2
 
-//marginal effects at means for E('wscei')
+//marginal effects at means for E('wscei'), unconditional ME
 quietly heckman wscei age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574 /*
 */age75above male bachabv dipcert year12, select(working =age1819 age2021 /*
 */age2224 age2534 age3544 age4554 age5564 age6574  age75above male bachabv /*
 */dipcert year12 married depkid)
-
 margins, dydx(*) atmean
-//marginal effects at means for E('wscei'|working=1)
+
+//marginal effects at means for E('wscei'|working=1), conditional ME
 margins, dydx(*) predict(ycond) atmean
+//Continued from our previous discussion about the negative rho, we can see 
+//some weird results from these two marginal effects. For instance, the marginal 
+//effect of achieving bachelor degree is larger on the working group which is 
+//582.4258 while 558.4575 on the whole population. In reality, we think
+//education should have bigger marginal effect on the whole population than 
+//the working people since employees are often have higher education level than
+//unemployees. This result is caused by the fact that our estimated rho is
+//negative.
 
 //Estimate a Tobit model for 'wscei' with a left censoring point of wscei=0.
 //Task B Question 3
