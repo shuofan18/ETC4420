@@ -80,7 +80,6 @@ outreg2 using poisson.xls, replace title(poisson regression) sideway/*
 //Estimate marginal effect of Poisson model (Task A Question 1)
 
 margins, dydx(*)
-outreg2 using poisson.xls, append sideway stats(coef se tstat)
 
 //Predict number of visits using Poisson model (Task A question 2 table 1 part 1)
 
@@ -104,7 +103,6 @@ outreg2 using ngbinom.xls, replace title(negative binomial model) sideway/*
 //Estimate marginal effect of Negative Binomial model (Task A Question 1)
 
 margins, dydx(*)
-outreg2 using ngbinom.xls, append sideway stats(coef se tstat)
 
 //Predict number of visits using Negative Binomial model
 //(Task A question 2 table 2 part 1)
@@ -197,8 +195,8 @@ lab var working "=1 for working people, =0 otherwise"
 
 //Check the new variable by looking at its summary statistics.
 tab working
-//In general, there are 8216 working people in this dataset, while 8216
-//non-working people. This 'working' variable may not be necessarily accurate
+//In this subset, there are 8216 working people indicated by 'working', while 
+//8216 non-working people. This 'working' variable maybe not necessarily accurate
 //given the way we generated it. So we check the cross tabulation of it with 
 //other employment status variables.
 tab esbrd working
@@ -218,25 +216,42 @@ sum
 //Random sampling works fine.
 
 //Estimate a Heckman sample selection model using Two-step Heckit Estimator
-//Task B question 1
+//Task B Question 1
 
 heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
 */ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
 */ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
 */bachabv dipcert year12 married depkid) twostep
-//Task B question 1, estimate a Heckman sample selection model using MLE
+
+
+//Estimate a Heckman sample selection model using MLE
+//Task B Question 1
+
 heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
 */ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
 */ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
 */bachabv dipcert year12 married depkid)
 
-//Task B question 2, marginal effects of E(y)
+//Estimate the marginal effects for E('wscei') and E('wscei'|working=1)based on 
+//the MLE model above.
+//Task B Question 2
+
+//marginal effects at means for E('wscei')
 margins, dydx(*) atmean
-/***** marginal effects of E(y|z=1) ***/
+//marginal effects at means for E('wscei'|working=1)
 margins, dydx(*) predict(ycond) atmean
 
+//Estimate a Tobit model for 'wscei' with a left censoring point of wscei=0.
+//Task B Question 3
 
+tobit wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
+*/ age5564 age6574  male bachabv dipcert year12, ll
 
+//The β coefficients themselves measure how the unobserved variable yi changes 
+//with respect to changes in the regressors.
+
+//marginal effects at means for E('wscei')
+margins, dydx(*) atmean
 
 
 
