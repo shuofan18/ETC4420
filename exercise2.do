@@ -286,9 +286,10 @@ margins, dydx(*) predict(ycond) atmean
 
 //Estimate a Tobit model for 'wscei' with a left censoring point of wscei=0.
 //Task B Question 3
+//We use all variables as explanatory variables including married and depkid.
 
 tobit wscei age1819 age2021 age2224 age2534 age3544 age4554/*
-*/ age5564 age6574 age75above male bachabv dipcert year12, ll
+*/ age5564 age6574 age75above male bachabv dipcert year12 married depkid, ll
 
 //Unconditional marginal effects at means for E('wscei')
 margins, dydx(*) atmean
