@@ -218,19 +218,20 @@ sum
 //Estimate a Heckman sample selection model using Two-step Heckit Estimator
 //Task B Question 1
 
-heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
-*/ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
-*/ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
-*/bachabv dipcert year12 married depkid) twostep
+heckman wscei age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574 /*
+*/age75above male bachabv dipcert year12, select(working =age1819 age2021 /*
+*/age2224 age2534 age3544 age4554 age5564 age6574  age75above male bachabv /*
+*/dipcert year12 married depkid) twostep
 
 
 //Estimate a Heckman sample selection model using MLE
 //Task B Question 1
 
-heckman wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
-*/ age5564 age6574  male bachabv dipcert year12, select(working = age1517/*
-*/ age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574  male /*
-*/bachabv dipcert year12 married depkid)
+heckman wscei age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574 /*
+*/age75above male bachabv dipcert year12, select(working =age1819 age2021 /*
+*/age2224 age2534 age3544 age4554 age5564 age6574  age75above male bachabv /*
+*/dipcert year12 married depkid)
+
 
 //Estimate the marginal effects for E('wscei') and E('wscei'|working=1)based on 
 //the MLE model above.
@@ -247,12 +248,16 @@ margins, dydx(*) predict(ycond) atmean
 tobit wscei age1517 age1819 age2021 age2224 age2534 age3544 age4554/*
 */ age5564 age6574  male bachabv dipcert year12, ll
 
-//The β coefficients themselves measure how the unobserved variable yi changes 
+
+
+//The β coefficients themselves measure how the unobserved variable y* changes 
 //with respect to changes in the regressors.
 
-//marginal effects at means for E('wscei')
+//Unconditional marginal effects at means for E('wscei')
 margins, dydx(*) atmean
 
+//The β coefficients themselves measure how the unobserved variable y* changes 
+//with respect to changes in the regressors.
 
 
 
