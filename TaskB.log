@@ -1,0 +1,726 @@
+------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/stanza/Documents/GitHub/ETC4420/TaskB.log
+  log type:  text
+ opened on:  13 May 2018, 21:07:34
+
+. use "SS hilda.dta", replace
+
+. 
+. //Introduction and data cleaning.
+. //We are insterested in the factors determining the weekly wage for the whole 
+. //Australian population, using the wage data of those who are currently working.
+. //First, we check the data by looking at the summary statistics. 
+. sum
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      tifdip |     17,630    28804.57    34318.98          0     525580
+       wscei |     17,630    465.9306      708.23          0       7074
+   logincome |     13,389      10.136    1.128486          0   13.17226
+       esbrd |     17,630   -1.193477    5.088034        -10          3
+     esempst |     17,630   -2.107884    4.621856        -10          4
+-------------+---------------------------------------------------------
+         lfp |     13,301    .6824299    .4655487          0          1
+       scage |     11,515    6.264351    2.306265          1         10
+        male |     11,492    .4671076    .4989386          0          1
+      edhigh |     13,294    6.176395    2.625921          1          9
+      hhd0_4 |     17,630    .1313103    .4331161          0          4
+-------------+---------------------------------------------------------
+      hhd5_9 |     17,630    .1133863    .3975605          0          3
+     hhd1014 |     17,630    .1233693    .4214101          0          4
+     hhd1524 |     17,630    .1009075    .3813305          0          4
+  concession |     13,297    .1977138    .3982901          0          1
+      herate |     12,996    2.547476    1.036528          1          5
+-------------+---------------------------------------------------------
+      depkid |     17,630    .2441293     .429582          0          1
+   excellent |     12,996    .1564327    .3632791          0          1
+       vgood |     12,996    .3531856    .4779781          0          1
+        good |     12,996    .3201754    .4665618          0          1
+        fair |     12,996    .1268852    .3328571          0          1
+-------------+---------------------------------------------------------
+        poor |     12,996     .043321    .2035866          0          1
+     bachabv |     13,294    .2109222    .4079786          0          1
+     dipcert |     13,294    .3046487    .4602758          0          1
+      year12 |     13,294    .1597713    .3664076          0          1
+    lessyr12 |     13,294    .3246577    .4682644          0          1
+-------------+---------------------------------------------------------
+     age2534 |     11,515     .151802    .3588444          0          1
+     age3544 |     11,515    .1735128    .3787064          0          1
+     age4554 |     11,515    .1844551    .3878717          0          1
+     age5564 |     11,515    .1433782    .3504733          0          1
+     married |     13,286    .4693663    .4990795          0          1
+-------------+---------------------------------------------------------
+     age1517 |     11,515    .0521059    .2222503          0          1
+     age1819 |     11,515    .0397742    .1954368          0          1
+     age2021 |     11,515    .0363873    .1872601          0          1
+     age2224 |     11,515    .0506296    .2192497          0          1
+     age6574 |     11,515    .0968302    .2957393          0          1
+-------------+---------------------------------------------------------
+  age75above |     11,515    .0711246    .2570441          0          1
+  age65above |     11,515    .1679548    .3738424          0          1
+  age24below |     11,515    .1788971    .3832828          0          1
+
+. ///In this dataset, we have variables relating personal earnings, age, gender,
+> //current employment status, eduction level, number of dependent children,
+. //having concenssion card or not, self-reported health, and marital status.
+. //All variables are discrete or dummy variables except income related variables.
+. 
+. //There are a lot of missing values in logincome, which is caused by the zero
+. //in disposable income. There are also missing values in 'lfp' because many
+. //people did not respond to the employment status question in the survey. Same 
+. //with 'esempst' which is a more detailed employment status variable, 'scage'
+. //which indicating age group,  'male', 'edhigh' which is the highest education 
+. //level, 'concession' and 'married'.
+. //Since we want to study the weekly wage, we will use 'wscei' as our dependent 
+. //variable. So we check its histogram.
+. histogram wscei
+(bin=42, start=0, width=168.42857)
+
+. //From this histogram we can see 'wscei' has a lot of zero values. So we create
+. //a new variable call pos_wscei for the non-zero values in wscei and check how 
+. //they are distributed.
+. gen pos_wscei=wscei if wscei>0
+(9,414 missing values generated)
+
+. histogram pos_wscei
+(bin=39, start=8, width=181.17949)
+
+. //The distribution of all positive wscei values is a positively skewed
+. //distribution, where it may be better to do log transformation to it and 
+. //then analyse. But if so we will have much less observations since a lot of 
+. //missing values will be generated by this log-transformation. 
+. //This could be a problem for Tobit model.
+. //Therefore, we will use wscei directly as our dependent variable.
+. //Also we want to keep as many observations as we could, 
+. //so we will not use any employment status related variables in this data set 
+. //directly. Instead, we will generate a new dummy variable called 'working' 
+. //indicating if a person is working or not given the value of his/her 'wscei'
+. //as our selection variable.
+. //We will also use 'male', detailed 'age' band variables (the youngest group is
+. //the reference level) since we have relatively large sample size, 
+. //and four 'education' levels (less than year 12 will be omitted as the
+. //reference) as the determinants for the outcome equation. Because age and
+. //education are obviously have strong correlation with one's wage. To confirm,
+. //we do cross tabulation for age and wage.
+. tab scage, summarize(wscei)
+
+SCQ:F2 Self |
+ completion | Summary of DV: Current weekly gross
+questionnai |    wages & salary - all jobs ($)
+    re: age |      [imputed] [weighted topco
+      group |        Mean   Std. Dev.       Freq.
+------------+------------------------------------
+  Age 15-17 |       63.02   122.47624         600
+  Age 18-19 |   249.77074   271.87939         458
+  Age 20-21 |   359.51313   369.44864         419
+  Age 22-24 |   623.78731   485.98151         583
+  Age 25-34 |   828.03947   709.51346       1,748
+  Age 35-44 |   880.94144   863.56018       1,998
+  Age 45-54 |   864.92279   806.08087       2,124
+  Age 55-64 |   547.02362   764.27236       1,651
+  Age 65-74 |   91.009865   445.61482       1,115
+  Age 75 ab |   15.978022   258.20785         819
+------------+------------------------------------
+      Total |   584.35423   748.24766      11,515
+
+. //From this cross tabulation, we can see strong relationship between 'age' and 
+. //'wscei'. Wage is increasing with age before 45-54, and dreasing with it after.
+. //Unfortunately, gender is assumed to still have some impact as well.
+. //'Marital status' and 'dependent children' will be included in the selection 
+. //equation as extra IVs. Because these two factors will definitely have impact
+. //on one person's employment status but assumed to be irrelevant to one's wage.
+. 
+. gen working = wscei != 0
+
+. lab var working "=1 for working people, =0 otherwise"
+
+. 
+. //Check the new variable by looking at its summary statistics.
+. tab working
+
+     =1 for |
+    working |
+ people, =0 |
+  otherwise |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      9,414       53.40       53.40
+          1 |      8,216       46.60      100.00
+------------+-----------------------------------
+      Total |     17,630      100.00
+
+. //In this subset, there are 8216 working people indicated by 'working', while 
+. //9414 non-working people. This 'working' variable maybe not necessarily accurate
+. //given the way we generated it. So we check the cross tabulation of it with 
+. //other employment status variables.
+. tab esbrd working
+
+DV: Labour |
+     force |    =1 for working
+  status - | people, =0 otherwise
+     broad |         0          1 |     Total
+-----------+----------------------+----------
+       -10 |     3,882        447 |     4,329 
+         1 |       887      7,690 |     8,577 
+         2 |       491          9 |       500 
+         3 |     4,154         70 |     4,224 
+-----------+----------------------+----------
+     Total |     9,414      8,216 |    17,630 
+
+
+. //We can see there are some mismatch between the two, since some 'employee' 
+. //indicated by 'esbrd' are grouped as 0 in 'working'. This may because some 
+. //employees did not report the weekly wage. As far as our assignment concerned,
+. //we will assume the working status are mostly correctly specified and use it in 
+. //our further analysis.
+. 
+. **********  Task B **********  Questions ********** 
+. 
+. set seed 27886913
+
+. sample 12000, count
+(5,630 observations deleted)
+
+. 
+. //Check data again after sampling.
+. sum
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      tifdip |     12,000    28701.39     33390.4          0     525580
+       wscei |     12,000    464.3617    703.7495          0       7074
+   logincome |      9,131    10.12988    1.139136          0   13.17226
+       esbrd |     12,000    -1.20725    5.086989        -10          3
+     esempst |     12,000   -2.104667    4.629669        -10          4
+-------------+---------------------------------------------------------
+         lfp |      9,047    .6872997     .463619          0          1
+       scage |      7,808    6.242316    2.304576          1         10
+        male |      7,791    .4664356    .4989042          0          1
+      edhigh |      9,041    6.191682    2.628192          1          9
+      hhd0_4 |     12,000    .1346667    .4384224          0          4
+-------------+---------------------------------------------------------
+      hhd5_9 |     12,000      .11125    .3924958          0          3
+     hhd1014 |     12,000      .12375    .4236164          0          4
+     hhd1524 |     12,000      .10025    .3806293          0          4
+  concession |      9,043    .1955103     .396615          0          1
+      herate |      8,839    2.549497    1.034815          1          5
+-------------+---------------------------------------------------------
+      depkid |     12,000    .2473333    .4314801          0          1
+   excellent |      8,839    .1556737    .3625662          0          1
+       vgood |      8,839    .3513972    .4774338          0          1
+        good |      8,839     .324358    .4681609          0          1
+        fair |      8,839     .124901    .3306253          0          1
+-------------+---------------------------------------------------------
+        poor |      8,839    .0436701    .2043716          0          1
+     bachabv |      9,041    .2089371    .4065718          0          1
+     dipcert |      9,041    .3035062    .4597973          0          1
+      year12 |      9,041    .1594956    .3661579          0          1
+    lessyr12 |      9,041    .3280611    .4695332          0          1
+-------------+---------------------------------------------------------
+     age2534 |      7,808    .1507428    .3578209          0          1
+     age3544 |      7,808    .1739242    .3790685          0          1
+     age4554 |      7,808    .1885246    .3911556          0          1
+     age5564 |      7,808      .13896     .345927          0          1
+     married |      9,037    .4670798    .4989427          0          1
+-------------+---------------------------------------------------------
+     age1517 |      7,808    .0523822    .2228108          0          1
+     age1819 |      7,808    .0394467    .1946677          0          1
+     age2021 |      7,808    .0390625    .1937561          0          1
+     age2224 |      7,808    .0513576    .2207402          0          1
+     age6574 |      7,808    .0961834    .2948615          0          1
+-------------+---------------------------------------------------------
+  age75above |      7,808     .069416    .2541765          0          1
+  age65above |      7,808    .1655994    .3717444          0          1
+  age24below |      7,808     .182249    .3860743          0          1
+   pos_wscei |      5,639    988.1789    732.3392          8       7074
+     working |     12,000    .4699167     .499115          0          1
+
+. tab working
+
+     =1 for |
+    working |
+ people, =0 |
+  otherwise |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      6,361       53.01       53.01
+          1 |      5,639       46.99      100.00
+------------+-----------------------------------
+      Total |     12,000      100.00
+
+. //Random sampling works fine. Now we have 6361 non-working people while 5639 
+. //working people in this subset (indicated by 'working').
+. 
+. //Estimate a Heckman sample selection model using Two-step Heckit Estimator
+. //Task B Question 1
+. 
+. heckman wscei age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574 /*
+> */age75above male bachabv dipcert year12, select(working =age1819 age2021 /*
+> */age2224 age2534 age3544 age4554 age5564 age6574  age75above male bachabv /*
+> */dipcert year12 married depkid) twostep
+
+Heckman selection model -- two-step estimates   Number of obs     =      7,773
+(regression model with sample selection)        Censored obs      =      3,188
+                                                Uncensored obs    =      4,585
+
+                                                Wald chi2(13)     =    1520.84
+                                                Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+wscei        |
+     age1819 |    20.9906   91.96537     0.23   0.819    -159.2582    201.2394
+     age2021 |   171.3426   87.00424     1.97   0.049     .8174215    341.8678
+     age2224 |   314.0533   96.14984     3.27   0.001     125.6031    502.5036
+     age2534 |   485.4391   86.32476     5.62   0.000     316.2456    654.6325
+     age3544 |   653.0168   80.33011     8.13   0.000     495.5727    810.4609
+     age4554 |   636.7439   83.33921     7.64   0.000      473.402    800.0857
+     age5564 |   693.6065   56.37258    12.30   0.000     583.1182    804.0947
+     age6574 |    728.428   234.0682     3.11   0.002     269.6627    1187.193
+  age75above |   473.4848   420.1022     1.13   0.260    -349.9004     1296.87
+        male |   414.5157   29.14166    14.22   0.000      357.399    471.6323
+     bachabv |   476.8124   72.07499     6.62   0.000      335.548    618.0768
+     dipcert |   83.87206   54.60045     1.54   0.125    -23.14285     190.887
+      year12 |   31.11975   51.83178     0.60   0.548    -70.46868    132.7082
+       _cons |   279.4026   217.1576     1.29   0.198    -146.2184    705.0237
+-------------+----------------------------------------------------------------
+working      |
+     age1819 |   .4732084   .1018177     4.65   0.000     .2736494    .6727673
+     age2021 |   .4026065   .1047247     3.84   0.000     .1973499     .607863
+     age2224 |   .5950708   .0990435     6.01   0.000     .4009491    .7891926
+     age2534 |   .5606164   .0837245     6.70   0.000     .3965194    .7247135
+     age3544 |    .539089   .0838288     6.43   0.000     .3747875    .7033906
+     age4554 |   .5444003   .0808776     6.73   0.000     .3858831    .7029175
+     age5564 |  -.1357797   .0803711    -1.69   0.091    -.2933042    .0217449
+     age6574 |  -1.422206   .0947312   -15.01   0.000    -1.607876   -1.236536
+  age75above |  -2.219415   .1490273   -14.89   0.000    -2.511503   -1.927327
+        male |   .1930478   .0325657     5.93   0.000     .1292202    .2568755
+     bachabv |   .5623953   .0481178    11.69   0.000      .468086    .6567045
+     dipcert |   .3808104   .0438266     8.69   0.000     .2949119    .4667089
+      year12 |    .322751   .0534262     6.04   0.000     .2180376    .4274644
+     married |   .0747545   .0388354     1.92   0.054    -.0013614    .1508704
+      depkid |  -.2003314   .0431237    -4.65   0.000    -.2848523   -.1158105
+       _cons |  -.2187881   .0641645    -3.41   0.001    -.3445482    -.093028
+-------------+----------------------------------------------------------------
+mills        |
+      lambda |  -354.2341    228.668    -1.55   0.121    -802.4152    93.94699
+-------------+----------------------------------------------------------------
+         rho |   -0.54007
+       sigma |  655.90234
+------------------------------------------------------------------------------
+
+. estimate store heckman_2step
+
+. 
+. //Estimate a Heckman sample selection model using MLE
+. //Task B Question 1
+. 
+. heckman wscei age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574 /*
+> */age75above male bachabv dipcert year12, select(working =age1819 age2021 /*
+> */age2224 age2534 age3544 age4554 age5564 age6574  age75above male bachabv /*
+> */dipcert year12 married depkid)
+
+Iteration 0:   log likelihood = -39998.658  
+Iteration 1:   log likelihood = -39946.294  
+Iteration 2:   log likelihood = -39939.694  
+Iteration 3:   log likelihood = -39939.517  
+Iteration 4:   log likelihood = -39939.515  
+
+Heckman selection model                         Number of obs     =      7,773
+(regression model with sample selection)        Censored obs      =      3,188
+                                                Uncensored obs    =      4,585
+
+                                                Wald chi2(13)     =    1793.60
+Log likelihood = -39939.52                      Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+wscei        |
+     age1819 |   100.7702   64.80034     1.56   0.120    -26.23608    227.7766
+     age2021 |   239.5955   66.14307     3.62   0.000     109.9574    369.2335
+     age2224 |   405.4718   61.45393     6.60   0.000     285.0243    525.9193
+     age2534 |   568.3523   54.81408    10.37   0.000     460.9187     675.786
+     age3544 |   727.3479   53.36289    13.63   0.000     622.7585    831.9372
+     age4554 |    716.491   53.02358    13.51   0.000     612.5666    820.4153
+     age5564 |   681.4518   54.22602    12.57   0.000     575.1707    787.7328
+     age6574 |   457.0782   92.59146     4.94   0.000     275.6022    638.5541
+  age75above |   9.759597    210.475     0.05   0.963    -402.7639    422.2831
+        male |    441.839   18.56917    23.79   0.000     405.4441    478.2339
+     bachabv |   558.4575   30.50586    18.31   0.000     498.6671    618.2479
+     dipcert |   142.1084   28.09868     5.06   0.000     87.03604    197.1809
+      year12 |   80.94965   32.22141     2.51   0.012     17.79684    144.1025
+       _cons |   16.86408   61.32882     0.27   0.783    -103.3382    137.0664
+-------------+----------------------------------------------------------------
+working      |
+     age1819 |   .4735348   .1017874     4.65   0.000     .2740351    .6730345
+     age2021 |   .4032183   .1046887     3.85   0.000     .1980322    .6084045
+     age2224 |   .5966616   .0990267     6.03   0.000     .4025728    .7907504
+     age2534 |   .5597442   .0837182     6.69   0.000     .3956595    .7238289
+     age3544 |   .5381888   .0838181     6.42   0.000     .3739083    .7024692
+     age4554 |   .5421747   .0808776     6.70   0.000     .3836575    .7006919
+     age5564 |  -.1388429   .0803695    -1.73   0.084    -.2963642    .0186784
+     age6574 |  -1.426241   .0947602   -15.05   0.000    -1.611968   -1.240514
+  age75above |  -2.222724   .1490798   -14.91   0.000    -2.514915   -1.930533
+        male |   .1937877   .0325938     5.95   0.000     .1299051    .2576703
+     bachabv |   .5648718   .0482329    11.71   0.000     .4703372    .6594065
+     dipcert |   .3803554   .0438232     8.68   0.000     .2944635    .4662474
+      year12 |    .322079    .053391     6.03   0.000     .2174345    .4267234
+     married |   .0805552   .0389322     2.07   0.039     .0042494    .1568609
+      depkid |  -.2044508   .0430552    -4.75   0.000    -.2888375   -.1200641
+       _cons |  -.2193841   .0641506    -3.42   0.001     -.345117   -.0936512
+-------------+----------------------------------------------------------------
+     /athrho |  -.1171751   .0734861    -1.59   0.111    -.2612051     .026855
+    /lnsigma |   6.412969    .011294   567.82   0.000     6.390833    6.435105
+-------------+----------------------------------------------------------------
+         rho |  -.1166417   .0724863                     -.2554224    .0268486
+       sigma |    609.701   6.885951                      596.3531    623.3477
+      lambda |  -71.11658    44.5073                     -158.3493    16.11612
+------------------------------------------------------------------------------
+LR test of indep. eqns. (rho = 0):   chi2(1) =     1.22   Prob > chi2 = 0.2693
+
+. 
+. estimate store heckman_mle
+
+. estimate table heckman_2step heckman_mle
+
+----------------------------------------
+    Variable | heckman_~p   heckman_~e  
+-------------+--------------------------
+wscei        |
+     age1819 |  20.990602    100.77024  
+     age2021 |   171.3426    239.59547  
+     age2224 |  314.05334    405.47179  
+     age2534 |  485.43905    568.35235  
+     age3544 |  653.01681    727.34787  
+     age4554 |  636.74388    716.49095  
+     age5564 |  693.60646    681.45178  
+     age6574 |  728.42797    457.07817  
+  age75above |  473.48476    9.7595968  
+        male |  414.51565      441.839  
+     bachabv |  476.81242    558.45748  
+     dipcert |  83.872062    142.10845  
+      year12 |   31.11975    80.949647  
+       _cons |  279.40263    16.864082  
+-------------+--------------------------
+working      |
+     age1819 |  .47320838    .47353477  
+     age2021 |  .40260646    .40321835  
+     age2224 |  .59507083     .5966616  
+     age2534 |  .56061645    .55974418  
+     age3544 |  .53908905    .53818876  
+     age4554 |  .54440033     .5421747  
+     age5564 | -.13577965    -.1388429  
+     age6574 |  -1.422206    -1.426241  
+  age75above | -2.2194148   -2.2227241  
+        male |  .19304783    .19378773  
+     bachabv |  .56239527    .56487183  
+     dipcert |   .3808104    .38035543  
+      year12 |  .32275101    .32207896  
+     married |  .07475448    .08055517  
+      depkid | -.20033139   -.20445081  
+       _cons |  -.2187881   -.21938407  
+-------------+--------------------------
+mills        |
+      lambda | -354.23408               
+-------------+--------------------------
+athrho       |
+       _cons |              -.11717507  
+-------------+--------------------------
+lnsigma      |
+       _cons |               6.4129687  
+----------------------------------------
+
+. 
+. //As we can see, the estimated coefficients are very different for these two
+. //methods in the outcome equation. I think the reason for that maybe relates to
+. // what we mentioned above, the distribution of the error may not be normal is,
+. //and this may affect our estimation. 
+. //The estimated standard deviations are very large. Hence the estimates are
+. //very sensitive to the change in estimating methods.
+. 
+. //What's more, we can see the estimated rho is negative. Intuitively, it is more
+. //reasonable to be positive. The residuals in the outcome equation and the 
+. //selection equation maybe positively correlted. Because the unobserved factors
+. //that make people working are more likely to also make people earn more.
+. //I think this may due to the lack of good IVs, since 'depkid' may be related 
+. //with how much one can earn. For example, for someone who works on hourly basis
+. //having dependent kids is more likely to reduce his/her working hours.
+. //Or it could also be X variables we put in the regressions taking
+. //too much information in residuals which over-compensated the issue. 
+. //Or even maybe our dataset is not a good one.
+. 
+. //Estimate the marginal effects for E('wscei') and E('wscei'|working=1) based on 
+. //the MLE model above.
+. //Task B Question 2
+. 
+. //marginal effects at means for E('wscei'), unconditional ME
+. quietly heckman wscei age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6
+> 574 /*
+> */age75above male bachabv dipcert year12, select(working =age1819 age2021 /*
+> */age2224 age2534 age3544 age4554 age5564 age6574  age75above male bachabv /*
+> */dipcert year12 married depkid)
+
+. margins, dydx(*) atmean
+
+Conditional marginal effects                    Number of obs     =      7,773
+Model VCE    : OIM
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574
+               age75above male bachabv dipcert year12 married depkid
+at           : age1819         =    .0394957 (mean)
+               age2021         =    .0392384 (mean)
+               age2224         =    .0515888 (mean)
+               age2534         =    .1510356 (mean)
+               age3544         =      .17445 (mean)
+               age4554         =    .1888589 (mean)
+               age5564         =    .1384279 (mean)
+               age6574         =    .0955873 (mean)
+               age75above      =     .068828 (mean)
+               male            =    .4662293 (mean)
+               bachabv         =    .2233372 (mean)
+               dipcert         =     .304001 (mean)
+               year12          =    .1554098 (mean)
+               married         =    .4868133 (mean)
+               depkid          =    .3145504 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age1819 |   100.7702   64.80034     1.56   0.120    -26.23608    227.7766
+     age2021 |   239.5955   66.14307     3.62   0.000     109.9574    369.2335
+     age2224 |   405.4718   61.45393     6.60   0.000     285.0243    525.9193
+     age2534 |   568.3523   54.81408    10.37   0.000     460.9187     675.786
+     age3544 |   727.3479   53.36289    13.63   0.000     622.7585    831.9372
+     age4554 |    716.491   53.02358    13.51   0.000     612.5666    820.4153
+     age5564 |   681.4518   54.22602    12.57   0.000     575.1707    787.7328
+     age6574 |   457.0782   92.59146     4.94   0.000     275.6022    638.5541
+  age75above |   9.759597    210.475     0.05   0.963    -402.7639    422.2831
+        male |    441.839   18.56917    23.79   0.000     405.4441    478.2339
+     bachabv |   558.4575   30.50586    18.31   0.000     498.6671    618.2479
+     dipcert |   142.1084   28.09868     5.06   0.000     87.03604    197.1809
+      year12 |   80.94965   32.22141     2.51   0.012     17.79684    144.1025
+     married |          0  (omitted)
+      depkid |          0  (omitted)
+------------------------------------------------------------------------------
+
+. 
+. //marginal effects at means for E('wscei'|working=1), conditional ME
+. margins, dydx(*) predict(ycond) atmean
+
+Conditional marginal effects                    Number of obs     =      7,773
+Model VCE    : OIM
+
+Expression   : E(wscei|Zg>0), predict(ycond)
+dy/dx w.r.t. : age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574
+               age75above male bachabv dipcert year12 married depkid
+at           : age1819         =    .0394957 (mean)
+               age2021         =    .0392384 (mean)
+               age2224         =    .0515888 (mean)
+               age2534         =    .1510356 (mean)
+               age3544         =      .17445 (mean)
+               age4554         =    .1888589 (mean)
+               age5564         =    .1384279 (mean)
+               age6574         =    .0955873 (mean)
+               age75above      =     .068828 (mean)
+               male            =    .4662293 (mean)
+               bachabv         =    .2233372 (mean)
+               dipcert         =     .304001 (mean)
+               year12          =    .1554098 (mean)
+               married         =    .4868133 (mean)
+               depkid          =    .3145504 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age1819 |    120.863    63.4425     1.91   0.057    -3.482016     245.208
+     age2021 |   256.7046   65.13026     3.94   0.000     129.0516    384.3576
+     age2224 |    430.789    59.6523     7.22   0.000     313.8727    547.7054
+     age2534 |   592.1031   53.15384    11.14   0.000     487.9235    696.2827
+     age3544 |    750.184   52.03488    14.42   0.000     648.1975    852.1705
+     age4554 |   739.4962   51.44799    14.37   0.000       638.66    840.3324
+     age5564 |   675.5605   54.11517    12.48   0.000     569.4967    781.6243
+     age6574 |   396.5607   82.19408     4.82   0.000     235.4633    557.6581
+  age75above |  -84.55379   197.7741    -0.43   0.669    -472.1839    303.0763
+        male |   450.0617   18.07393    24.90   0.000     414.6374    485.4859
+     bachabv |   582.4258   27.79517    20.95   0.000     527.9483    636.9033
+     dipcert |   158.2475   26.53923     5.96   0.000     106.2315    210.2634
+      year12 |   94.61592   31.20714     3.03   0.002     33.45106    155.7808
+     married |   3.418072   2.823236     1.21   0.226    -2.115368    8.951512
+      depkid |  -8.675143   5.809519    -1.49   0.135    -20.06159    2.711306
+------------------------------------------------------------------------------
+
+. //Continued from our previous discussion about the negative rho, we can see 
+. //some weird results from these two marginal effects. For instance, the marginal 
+. //effect of achieving bachelor degree is larger on the working group which is 
+. //582.4258 while 558.4575 on the whole population. In reality, we think
+. //education should have bigger marginal effect on the whole population than 
+. //the working people since employees are often have higher education level than
+. //unemployees. This result is caused by the fact that our estimated rho is
+. //negative.
+. 
+. //Estimate a Tobit model for 'wscei' with a left censoring point of wscei=0.
+. //Task B Question 3
+. //We use all variables as explanatory variables including married and depkid.
+. 
+. tobit wscei age1819 age2021 age2224 age2534 age3544 age4554/*
+> */ age5564 age6574 age75above male bachabv dipcert year12 married depkid, ll
+
+Tobit regression                                Number of obs     =      7,773
+                                                LR chi2(15)       =    3349.90
+                                                Prob > chi2       =     0.0000
+Log likelihood = -39549.646                     Pseudo R2         =     0.0406
+
+------------------------------------------------------------------------------
+       wscei |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age1819 |   307.5747    77.8936     3.95   0.000     154.8822    460.2671
+     age2021 |   376.1269   79.72989     4.72   0.000     219.8348     532.419
+     age2224 |   600.1776   73.29611     8.19   0.000     456.4975    743.8578
+     age2534 |   709.0059   64.55868    10.98   0.000     582.4535    835.5584
+     age3544 |   816.2957   65.11497    12.54   0.000     688.6528    943.9386
+     age4554 |   807.9417   63.43126    12.74   0.000     683.5993    932.2841
+     age5564 |    319.636   64.50042     4.96   0.000     193.1978    446.0743
+     age6574 |  -945.7605   78.89844   -11.99   0.000    -1100.423   -791.0982
+  age75above |  -1774.085   133.8622   -13.25   0.000    -2036.491   -1511.678
+        male |   446.6081   22.95076    19.46   0.000     401.6184    491.5978
+     bachabv |   757.1769   34.29345    22.08   0.000     689.9525    824.4013
+     dipcert |    328.042    32.3577    10.14   0.000     264.6122    391.4718
+      year12 |   243.1882    38.8888     6.25   0.000     166.9557    319.4208
+     married |   87.62388   27.63742     3.17   0.002     33.44708    141.8007
+      depkid |  -117.5416   29.74062    -3.95   0.000    -175.8412   -59.24194
+       _cons |  -640.5503   53.19214   -12.04   0.000    -744.8212   -536.2793
+-------------+----------------------------------------------------------------
+      /sigma |   896.5798   10.00008                      876.9769    916.1826
+------------------------------------------------------------------------------
+         3,188  left-censored observations at wscei <= 0
+         4,585     uncensored observations
+             0 right-censored observations
+
+. 
+. //Unconditional marginal effects at means for E('wscei') for Tobit 
+. margins, dydx(*) atmean
+
+Conditional marginal effects                    Number of obs     =      7,773
+Model VCE    : OIM
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574
+               age75above male bachabv dipcert year12 married depkid
+at           : age1819         =    .0394957 (mean)
+               age2021         =    .0392384 (mean)
+               age2224         =    .0515888 (mean)
+               age2534         =    .1510356 (mean)
+               age3544         =      .17445 (mean)
+               age4554         =    .1888589 (mean)
+               age5564         =    .1384279 (mean)
+               age6574         =    .0955873 (mean)
+               age75above      =     .068828 (mean)
+               male            =    .4662293 (mean)
+               bachabv         =    .2233372 (mean)
+               dipcert         =     .304001 (mean)
+               year12          =    .1554098 (mean)
+               married         =    .4868133 (mean)
+               depkid          =    .3145504 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age1819 |   307.5747    77.8936     3.95   0.000      154.906    460.2433
+     age2021 |   376.1269   79.72989     4.72   0.000     219.8592    532.3946
+     age2224 |   600.1776   73.29611     8.19   0.000     456.5199    743.8354
+     age2534 |   709.0059   64.55868    10.98   0.000     582.4733    835.5386
+     age3544 |   816.2957   65.11497    12.54   0.000     688.6727    943.9187
+     age4554 |   807.9417   63.43126    12.74   0.000     683.6187    932.2647
+     age5564 |    319.636   64.50042     4.96   0.000     193.2175    446.0545
+     age6574 |  -945.7605   78.89844   -11.99   0.000    -1100.399   -791.1224
+  age75above |  -1774.085   133.8622   -13.25   0.000     -2036.45   -1511.719
+        male |   446.6081   22.95076    19.46   0.000     401.6254    491.5908
+     bachabv |   757.1769   34.29345    22.08   0.000      689.963    824.3908
+     dipcert |    328.042    32.3577    10.14   0.000     264.6221    391.4619
+      year12 |   243.1882    38.8888     6.25   0.000     166.9676    319.4089
+     married |   87.62388   27.63742     3.17   0.002     33.45553    141.7922
+      depkid |  -117.5416   29.74062    -3.95   0.000    -175.8321   -59.25103
+------------------------------------------------------------------------------
+
+. //The β coefficients themselves measure how the unobserved variable y* changes 
+. //with respect to changes in the regressors. That's why these marginal effects
+. //are the same with our coefficient estimates in Tobit model.
+. 
+. 
+. //Conditional marginal effects at means for E('wscei'|working=1) for Tobit
+. margins, dydx(*) predict(ystar(0,.)) atmean
+
+Conditional marginal effects                    Number of obs     =      7,773
+Model VCE    : OIM
+
+Expression   : E(wscei*|wscei>0), predict(ystar(0,.))
+dy/dx w.r.t. : age1819 age2021 age2224 age2534 age3544 age4554 age5564 age6574
+               age75above male bachabv dipcert year12 married depkid
+at           : age1819         =    .0394957 (mean)
+               age2021         =    .0392384 (mean)
+               age2224         =    .0515888 (mean)
+               age2534         =    .1510356 (mean)
+               age3544         =      .17445 (mean)
+               age4554         =    .1888589 (mean)
+               age5564         =    .1384279 (mean)
+               age6574         =    .0955873 (mean)
+               age75above      =     .068828 (mean)
+               male            =    .4662293 (mean)
+               bachabv         =    .2233372 (mean)
+               dipcert         =     .304001 (mean)
+               year12          =    .1554098 (mean)
+               married         =    .4868133 (mean)
+               depkid          =    .3145504 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age1819 |   177.1378   44.86894     3.95   0.000     89.19634    265.0793
+     age2021 |   216.6183   45.95401     4.71   0.000     126.5501    306.6865
+     age2224 |   345.6532   42.33005     8.17   0.000     262.6878    428.6186
+     age2534 |   408.3294   37.41406    10.91   0.000     334.9992    481.6596
+     age3544 |   470.1195   37.80379    12.44   0.000     396.0254    544.2136
+     age4554 |   465.3083    36.8316    12.63   0.000     393.1197    537.4969
+     age5564 |   184.0842   37.23479     4.94   0.000     111.1054     257.063
+     age6574 |  -544.6806   44.73856   -12.17   0.000    -632.3666   -456.9947
+  age75above |  -1021.728     72.121   -14.17   0.000    -1163.082    -880.373
+        male |   257.2097   13.34586    19.27   0.000     231.0523    283.3671
+     bachabv |    436.072   19.87598    21.94   0.000     397.1157    475.0282
+     dipcert |   188.9253   18.58203    10.17   0.000     152.5052    225.3454
+      year12 |   140.0565   22.35938     6.26   0.000     96.23295    183.8801
+     married |   50.46418   15.91238     3.17   0.002      19.2765    81.65187
+      depkid |  -67.69433   17.12907    -3.95   0.000    -101.2667   -34.12196
+------------------------------------------------------------------------------
+
+. 
+. //Heckman SS model prodicts positive marginal effects of all variables for the
+. //unconditional group; while 'age above75' and having depkid has negative ME for
+. //working people.
+. //Tobit suggests negative ME of age above 65 and having depkid for both groups.
+. 
+. //Both of the models agree 'male' has a positive effect on wage, no matter 
+. //conditionally or unconditionally. As well as 'married' and education. 
+. 
+. //Theoritically, Tobit treats the data as censored, considering a zero-wage for 
+. //anyone who is not in the labor force, while the Heckman model treats data as
+. //truncated. These two are very different methods, unsurprisingly, the marginal 
+. //effects given by them are quite different. For example, Tobit estimates the 
+. //marginal effects of 'having bachelor degree' is larger on the unconditional
+. //group than the working group. This opposites what we observe from the Heckman
+. //sample selection model. 
+. //On the other hand, the non-normal distribution may has some impact on our 
+. //estimation as well. So these results may not be very reliable.
+. 
+. 
+. log close 
+      name:  <unnamed>
+       log:  /Users/stanza/Documents/GitHub/ETC4420/TaskB.log
+  log type:  text
+ closed on:  13 May 2018, 21:07:56
+------------------------------------------------------------------------------------

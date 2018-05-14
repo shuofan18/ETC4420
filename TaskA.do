@@ -4,7 +4,7 @@ clear
 cd /Users/stanza/documents/github/etc4420
 set more off
 capture log close
-log using Task_A.log,replace
+log using TaskA.log,replace
 use "gpvisits.dta", replace
 //Introduction and data cleaning.
 //We are interested in the impact of individual characteristics on GP visits.
@@ -99,8 +99,6 @@ sum p_visitspr0 p_visitspr1 p_visitspr2 p_visitspr3
 
 nbreg gpvisit age3039 age4049 age5059 age6069 age70up male logincome mcity poor/*
 */ fair good verygood
-outreg2 using ngbinom.xls, replace title(negative binomial model) sideway/*
-*/ stats(coef se tstat pval) bdec(3)
 
 //Estimate marginal effect of Negative Binomial model (Task A Question 1)
 

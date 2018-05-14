@@ -1,0 +1,598 @@
+------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/stanza/Documents/GitHub/ETC4420/TaskA.log
+  log type:  text
+ opened on:  13 May 2018, 21:06:46
+
+. use "gpvisits.dta", replace
+
+. //Introduction and data cleaning.
+. //We are interested in the impact of individual characteristics on GP visits.
+. //First, we check the data by looking at the summary statistics. 
+. sum
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      income |     19,501    583.0864    425.3656         99       1500
+    lnincome |     16,828    6.293494    .6437466   5.298317    7.31322
+       agecb |     19,501    10.15568    3.545538          4         18
+       mcity |     19,501    .6305318    .4826732          0          1
+        male |     19,501    .4562843     .498098          0          1
+-------------+---------------------------------------------------------
+         srh |     19,501    2.486744    1.095207          0          4
+   excellent |     19,501    .1880929    .3907964          0          1
+    verygood |     19,501    .3444439    .4751988          0          1
+        good |     19,501    .2863956    .4520881          0          1
+        fair |     19,501    .1282498    .3343764          0          1
+-------------+---------------------------------------------------------
+     gpvisit |     19,501    .2832675    .5667374          0          3
+     ageto29 |     19,501    .1687606    .3745499          0          1
+     age3039 |     19,501    .1987078    .3990378          0          1
+     age4049 |     19,501    .1995795    .3996945          0          1
+     age5059 |     19,501    .1667607    .3727716          0          1
+-------------+---------------------------------------------------------
+     age6069 |     19,501    .1232757    .3287619          0          1
+     age70up |     19,501    .1429157    .3499959          0          1
+        poor |     19,501    .0528178    .2236753          0          1
+
+. //In this dataset, we have information relating household income, age, gender,
+. //living in cities or not, self-reported health, and number of times consulted 
+. //GP in the last few weeks.
+. //All variables are discrete or dummy variables except 'income' and 'lnincome'.
+. //All variables have 19501 observations except 'lnincome'(which has only 16828)
+. //So check if 'income' looks normal. 
+. tab income
+
+  household |
+     income |      Freq.     Percent        Cum.
+------------+-----------------------------------
+         99 |      2,673       13.71       13.71
+        200 |      2,042       10.47       24.18
+        266 |      2,106       10.80       34.98
+        337 |      1,646        8.44       43.42
+        429 |      1,433        7.35       50.77
+        532 |      1,534        7.87       58.63
+        636 |      1,435        7.36       65.99
+        756 |      1,569        8.05       74.04
+        910 |      1,589        8.15       82.19
+       1138 |      1,668        8.55       90.74
+       1500 |      1,806        9.26      100.00
+------------+-----------------------------------
+      Total |     19,501      100.00
+
+. sum income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      income |     19,501    583.0864    425.3656         99       1500
+
+. //All values associated with income are positive, no zero values are detected.
+. //Generate a new variable named logincome and label it as log(income).
+. gen logincome=log(income)
+
+. lab var logincome "log(income)"
+
+. //Check if the new log(income) has any missing values.
+. tab logincome
+
+log(income) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+    4.59512 |      2,673       13.71       13.71
+   5.298317 |      2,042       10.47       24.18
+   5.583496 |      2,106       10.80       34.98
+   5.820083 |      1,646        8.44       43.42
+   6.061457 |      1,433        7.35       50.77
+   6.276643 |      1,534        7.87       58.63
+   6.455199 |      1,435        7.36       65.99
+   6.628041 |      1,569        8.05       74.04
+   6.813445 |      1,589        8.15       82.19
+   7.037028 |      1,668        8.55       90.74
+   7.313221 |      1,806        9.26      100.00
+------------+-----------------------------------
+      Total |     19,501      100.00
+
+. sum logincome
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+   logincome |     19,501    6.060698    .8359437    4.59512   7.313221
+
+. //There is no missing values in the new log(income). 
+. //And logincome is ranging from 4.5951 to 7.3132.
+. //By comparing logincome with lnincome (which is ranging from 5.2983 to 7.3132), 
+. //the lowest income (99) was found missing in lnincome. Given this, we will not
+. //use lnincome in our following regressions, instead, we will use logincome.
+. //Then we check the dependent variable gpvisit.
+. tab gpvisit
+
+     Number of |
+         times |
+     consulted |
+       general |
+  practitioner |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+Not applicable |     14,953       76.68       76.68
+             1 |      3,748       19.22       95.90
+             2 |        624        3.20       99.10
+     3 or more |        176        0.90      100.00
+---------------+-----------------------------------
+         Total |     19,501      100.00
+
+. proportion gpvisit
+
+Proportion estimation             Number of obs   =     19,501
+
+      _prop_1: gpvisit = Not applicable
+      _prop_4: gpvisit = 3 or more
+
+--------------------------------------------------------------
+             | Proportion   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+gpvisit      |
+     _prop_1 |   .7667812   .0030283       .760793    .7726643
+           1 |   .1921953   .0028217      .1867251    .1977867
+           2 |   .0319984   .0012603      .0296181    .0345631
+     _prop_4 |   .0090252   .0006772        .00779    .0104541
+--------------------------------------------------------------
+
+. //In 2004-05, 76.8% of individuals did not visit a GP, 19.22% visited once, 
+. //3.2% visited twice and 0.9% visted 3 or more times.
+. //With the data all clean, we are now ready to do the analysis.
+. 
+. **********  Task A **********  Questions **********
+. 
+. set seed 27886913
+
+. sample 10000, count
+(9,501 observations deleted)
+
+. //Check if the sampling works as expected.
+. sum
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      income |     10,000    585.9497    427.1271         99       1500
+    lnincome |      8,641    6.297155    .6442448   5.298317    7.31322
+       agecb |     10,000     10.1462    3.539729          4         18
+       mcity |     10,000       .6322    .4822307          0          1
+        male |     10,000        .454    .4979044          0          1
+-------------+---------------------------------------------------------
+         srh |     10,000      2.4925    1.097207          0          4
+   excellent |     10,000       .1895    .3919249          0          1
+    verygood |     10,000       .3483    .4764555          0          1
+        good |     10,000         .28    .4490213          0          1
+        fair |     10,000       .1296    .3358796          0          1
+-------------+---------------------------------------------------------
+     gpvisit |     10,000       .2878    .5718425          0          3
+     ageto29 |     10,000       .1684    .3742398          0          1
+     age3039 |     10,000       .2033     .402474          0          1
+     age4049 |     10,000       .1971    .3978284          0          1
+     age5059 |     10,000       .1641    .3703848          0          1
+-------------+---------------------------------------------------------
+     age6069 |     10,000       .1259    .3317532          0          1
+     age70up |     10,000       .1412    .3482452          0          1
+        poor |     10,000       .0526    .2232448          0          1
+   logincome |     10,000    6.065849    .8359806    4.59512   7.313221
+
+. //After sampling, we have 10000 observations, the data looks clean.
+. //Check the dependent variable again after sampling.
+. //Observed probability of count (Task A Question 2 table 1 & 2 part 2)
+. tab gpvisit
+
+     Number of |
+         times |
+     consulted |
+       general |
+  practitioner |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+Not applicable |      7,634       76.34       76.34
+             1 |      1,952       19.52       95.86
+             2 |        316        3.16       99.02
+     3 or more |         98        0.98      100.00
+---------------+-----------------------------------
+         Total |     10,000      100.00
+
+. proportion gpvisit
+
+Proportion estimation             Number of obs   =     10,000
+
+      _prop_1: gpvisit = Not applicable
+      _prop_4: gpvisit = 3 or more
+
+--------------------------------------------------------------
+             | Proportion   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+gpvisit      |
+     _prop_1 |      .7634   .0042502      .7549679    .7716297
+           1 |      .1952   .0039637      .1875472     .203087
+           2 |      .0316   .0017494      .0283451    .0352152
+     _prop_4 |      .0098   .0009851      .0080458     .011932
+--------------------------------------------------------------
+
+. //In this subset, in 2004-05, 76.3% of individuals did not visit a GP, 
+. //19.52% visited once, 3.16% visited twice and 0.98% visted 3 or more times.
+. //All numbers are similar to what we got from the whole sample.
+. 
+. //We will use gpvisit as our dependent variable; age, gender, income, living in 
+. //cities or not, self-reported health as our independent variables.
+. //First check relationship between income and GP visits by cross tabulation and 
+. //histgram since we want to treat log(income) as continuous.
+. bysort gpvisit: tab logincome
+
+------------------------------------------------------------------------------------
+-> gpvisit = Not applic
+
+log(income) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+    4.59512 |      1,063       13.92       13.92
+   5.298317 |        715        9.37       23.29
+   5.583496 |        655        8.58       31.87
+   5.820083 |        600        7.86       39.73
+   6.061457 |        568        7.44       47.17
+   6.276643 |        619        8.11       55.28
+   6.455199 |        591        7.74       63.02
+   6.628041 |        678        8.88       71.90
+   6.813445 |        660        8.65       80.55
+   7.037028 |        677        8.87       89.42
+   7.313221 |        808       10.58      100.00
+------------+-----------------------------------
+      Total |      7,634      100.00
+
+------------------------------------------------------------------------------------
+-> gpvisit = 1
+
+log(income) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+    4.59512 |        253       12.96       12.96
+   5.298317 |        277       14.19       27.15
+   5.583496 |        318       16.29       43.44
+   5.820083 |        212       10.86       54.30
+   6.061457 |        150        7.68       61.99
+   6.276643 |        130        6.66       68.65
+   6.455199 |        108        5.53       74.18
+   6.628041 |        138        7.07       81.25
+   6.813445 |        103        5.28       86.53
+   7.037028 |        141        7.22       93.75
+   7.313221 |        122        6.25      100.00
+------------+-----------------------------------
+      Total |      1,952      100.00
+
+------------------------------------------------------------------------------------
+-> gpvisit = 2
+
+log(income) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+    4.59512 |         36       11.39       11.39
+   5.298317 |         50       15.82       27.22
+   5.583496 |         48       15.19       42.41
+   5.820083 |         37       11.71       54.11
+   6.061457 |         25        7.91       62.03
+   6.276643 |         22        6.96       68.99
+   6.455199 |         20        6.33       75.32
+   6.628041 |         20        6.33       81.65
+   6.813445 |         20        6.33       87.97
+   7.037028 |         17        5.38       93.35
+   7.313221 |         21        6.65      100.00
+------------+-----------------------------------
+      Total |        316      100.00
+
+------------------------------------------------------------------------------------
+-> gpvisit = 3 or more
+
+log(income) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+    4.59512 |          7        7.14        7.14
+   5.298317 |         11       11.22       18.37
+   5.583496 |         17       17.35       35.71
+   5.820083 |         11       11.22       46.94
+   6.061457 |          9        9.18       56.12
+   6.276643 |          8        8.16       64.29
+   6.455199 |          9        9.18       73.47
+   6.628041 |          8        8.16       81.63
+   6.813445 |          7        7.14       88.78
+   7.037028 |          5        5.10       93.88
+   7.313221 |          6        6.12      100.00
+------------+-----------------------------------
+      Total |         98      100.00
+
+
+. histogram logincome, percent by (gpvisit)
+
+. //From the tabulation and the four histogram, 
+. //we can see the relationship between log(income) and GP visits is not linear. 
+. //The visits increase with the first three income level, 
+. //and then start to decrease from the third income level.
+. //We will reproduce the tables in our slides first and then discuss the impact 
+. //of this nonlinearity afterwards.
+. 
+. //Estimate a linear regression model (Task A Question 1)
+. 
+. reg gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
+> */ mcity poor fair good verygood
+
+      Source |       SS           df       MS      Number of obs   =    10,000
+-------------+----------------------------------   F(12, 9987)     =     72.78
+       Model |  262.954912        12  21.9129093   Prob > F        =    0.0000
+    Residual |  3006.75669     9,987  .301067056   R-squared       =    0.0804
+-------------+----------------------------------   Adj R-squared   =    0.0793
+       Total |   3269.7116     9,999   .32700386   Root MSE        =     .5487
+
+------------------------------------------------------------------------------
+     gpvisit |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age3039 |  -.0005315   .0180975    -0.03   0.977    -.0360062    .0349433
+     age4049 |  -.0029307   .0182491    -0.16   0.872    -.0387027    .0328412
+     age5059 |   .0143155    .019163     0.75   0.455    -.0232479    .0518789
+     age6069 |   .0954774   .0207782     4.60   0.000      .054748    .1362069
+     age70up |   .1944174   .0205486     9.46   0.000      .154138    .2346967
+        male |  -.0835419    .011124    -7.51   0.000    -.1053472   -.0617367
+   logincome |   .0030538   .0069285     0.44   0.659    -.0105275    .0166352
+       mcity |   .0265614    .011429     2.32   0.020     .0041583    .0489645
+        poor |   .4589589   .0277117    16.56   0.000     .4046384    .5132793
+        fair |   .2972142   .0203338    14.62   0.000     .2573559    .3370725
+        good |   .0942651   .0164979     5.71   0.000      .061926    .1266043
+    verygood |   .0232657   .0156928     1.48   0.138    -.0074953    .0540267
+       _cons |   .1521181   .0468476     3.25   0.001     .0602873    .2439489
+------------------------------------------------------------------------------
+
+. outreg2 using linear.xls, replace title(Linear regression model)/*
+> */ sideway stats(coef se tstat pval ci) bdec(3) 
+linear.xls
+dir : seeout
+
+. 
+. //Estimate poisson regression model (Task A Question 1)
+. 
+. poisson gpvisit age3039 age4049 age5059 age6069 age70up male logincome/*
+> */ mcity poor fair good verygood
+
+Iteration 0:   log likelihood = -6465.1974  
+Iteration 1:   log likelihood = -6464.3476  
+Iteration 2:   log likelihood = -6464.3469  
+Iteration 3:   log likelihood = -6464.3469  
+
+Poisson regression                              Number of obs     =     10,000
+                                                LR chi2(12)       =     785.60
+                                                Prob > chi2       =     0.0000
+Log likelihood = -6464.3469                     Pseudo R2         =     0.0573
+
+------------------------------------------------------------------------------
+     gpvisit |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age3039 |   .0106624   .0709261     0.15   0.881    -.1283502     .149675
+     age4049 |   .0075848   .0709853     0.11   0.915    -.1315438    .1467133
+     age5059 |   .0895589   .0718843     1.25   0.213    -.0513317    .2304496
+     age6069 |   .3435121    .071712     4.79   0.000     .2029591    .4840651
+     age70up |   .5439121   .0677556     8.03   0.000     .4111136    .6767105
+        male |  -.2973939   .0388387    -7.66   0.000    -.3735164   -.2212714
+   logincome |   .0031875   .0249698     0.13   0.898    -.0457524    .0521274
+       mcity |    .088457   .0390046     2.27   0.023     .0120093    .1649047
+        poor |   1.198501   .0788145    15.21   0.000     1.044028    1.352975
+        fair |   .9407993    .069283    13.58   0.000     .8050071    1.076591
+        good |   .4337492   .0658422     6.59   0.000     .3047008    .5627977
+    verygood |   .1345315   .0664939     2.02   0.043     .0042059    .2648571
+       _cons |  -1.801247   .1731126   -10.41   0.000    -2.140541   -1.461952
+------------------------------------------------------------------------------
+
+. outreg2 using poisson.xls, replace title(poisson regression) sideway/*
+> */ stats(coef se tstat pval) bdec(3)
+poisson.xls
+dir : seeout
+
+. 
+. //Estimate marginal effect of Poisson model (Task A Question 1)
+. 
+. margins, dydx(*)
+
+Average marginal effects                        Number of obs     =     10,000
+Model VCE    : OIM
+
+Expression   : Predicted number of events, predict()
+dy/dx w.r.t. : age3039 age4049 age5059 age6069 age70up male logincome mcity poor
+               fair good verygood
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age3039 |   .0030686   .0204126     0.15   0.881    -.0369393    .0430766
+     age4049 |   .0021829   .0204296     0.11   0.915    -.0378584    .0422242
+     age5059 |   .0257751   .0206939     1.25   0.213    -.0147842    .0663343
+     age6069 |   .0988628   .0207208     4.77   0.000     .0582507    .1394749
+     age70up |   .1565379   .0197172     7.94   0.000      .117893    .1951828
+        male |    -.08559   .0112911    -7.58   0.000      -.10772   -.0634599
+   logincome |   .0009174   .0071863     0.13   0.898    -.0131676    .0150023
+       mcity |   .0254579   .0112356     2.27   0.023     .0034366    .0474792
+        poor |   .3449287   .0235765    14.63   0.000     .2987197    .3911378
+        fair |    .270762   .0205685    13.16   0.000     .2304485    .3110755
+        good |    .124833   .0190917     6.54   0.000     .0874139    .1622521
+    verygood |   .0387182   .0191505     2.02   0.043     .0011838    .0762525
+------------------------------------------------------------------------------
+
+. 
+. //Predict number of visits using Poisson model (Task A question 2 table 1 part 1)
+. 
+. predict p_gpvisit, n
+
+. sum gpvisit p_gpvisit
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+     gpvisit |     10,000       .2878    .5718425          0          3
+   p_gpvisit |     10,000       .2878    .1663164   .1244323   1.053433
+
+. 
+. //Predicted probability of counts using Poisson model 
+. //(Task A question 2 table 1 part 3)
+. //(need to install st0002.pkg here)
+. 
+. prcounts p_visits, max(3)
+
+. sum p_visitspr0 p_visitspr1 p_visitspr2 p_visitspr3
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ p_visitspr0 |     10,000    .7593138    .1088067   .3487386    .882998
+ p_visitspr1 |     10,000    .2005598    .0662811   .1098734   .3676501
+ p_visitspr2 |     10,000    .0341295    .0337623   .0068359   .1935012
+ p_visitspr3 |     10,000    .0051394    .0094598   .0002835   .0679468
+
+. 
+. //Estimate Negative Binomial model (Task A Question 1)
+. 
+. nbreg gpvisit age3039 age4049 age5059 age6069 age70up male logincome mcity poor/*
+> */ fair good verygood
+
+Fitting Poisson model:
+
+Iteration 0:   log likelihood = -6465.1974  
+Iteration 1:   log likelihood = -6464.3476  
+Iteration 2:   log likelihood = -6464.3469  
+Iteration 3:   log likelihood = -6464.3469  
+
+Fitting constant-only model:
+
+Iteration 0:   log likelihood =   -6841.82  
+Iteration 1:   log likelihood = -6819.4186  
+Iteration 2:   log likelihood = -6819.1174  
+Iteration 3:   log likelihood = -6819.1113  
+Iteration 4:   log likelihood = -6819.1113  
+
+Fitting full model:
+
+Iteration 0:   log likelihood = -6497.3346  
+Iteration 1:   log likelihood = -6462.9643  
+Iteration 2:   log likelihood = -6460.1083  
+Iteration 3:   log likelihood = -6459.9103  
+Iteration 4:   log likelihood = -6459.9093  
+Iteration 5:   log likelihood = -6459.9093  
+
+Negative binomial regression                    Number of obs     =     10,000
+                                                LR chi2(12)       =     718.40
+Dispersion     = mean                           Prob > chi2       =     0.0000
+Log likelihood = -6459.9093                     Pseudo R2         =     0.0527
+
+------------------------------------------------------------------------------
+     gpvisit |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age3039 |   .0100528   .0721136     0.14   0.889    -.1312871    .1513928
+     age4049 |   .0057609   .0722157     0.08   0.936    -.1357793    .1473011
+     age5059 |   .0888556   .0732317     1.21   0.225    -.0546759    .2323872
+     age6069 |   .3440773   .0732724     4.70   0.000     .2004659    .4876886
+     age70up |   .5479166   .0693058     7.91   0.000     .4120798    .6837535
+        male |  -.3003243    .039742    -7.56   0.000    -.3782172   -.2224313
+   logincome |     .00309   .0255284     0.12   0.904    -.0469447    .0531247
+       mcity |   .0886362   .0399865     2.22   0.027     .0102641    .1670084
+        poor |   1.202051   .0810572    14.83   0.000     1.043182    1.360921
+        fair |   .9400119   .0706973    13.30   0.000     .8014479    1.078576
+        good |   .4323287   .0668336     6.47   0.000     .3013373    .5633202
+    verygood |    .133413   .0673807     1.98   0.048     .0013492    .2654767
+       _cons |  -1.799298    .176733   -10.18   0.000    -2.145688   -1.452908
+-------------+----------------------------------------------------------------
+    /lnalpha |  -1.992391   .3608724                     -2.699688   -1.285094
+-------------+----------------------------------------------------------------
+       alpha |    .136369   .0492118                      .0672265    .2766246
+------------------------------------------------------------------------------
+Likelihood-ratio test of alpha=0:  chibar2(01) =    8.88 Prob>=chibar2 = 0.001
+
+. 
+. //Estimate marginal effect of Negative Binomial model (Task A Question 1)
+. 
+. margins, dydx(*)
+
+Average marginal effects                        Number of obs     =     10,000
+Model VCE    : OIM
+
+Expression   : Predicted number of events, predict()
+dy/dx w.r.t. : age3039 age4049 age5059 age6069 age70up male logincome mcity poor
+               fair good verygood
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age3039 |   .0028948   .0207661     0.14   0.889    -.0378059    .0435956
+     age4049 |   .0016589   .0207954     0.08   0.936    -.0390994    .0424172
+     age5059 |   .0255871   .0210938     1.21   0.225    -.0157559    .0669301
+     age6069 |   .0990814   .0211919     4.68   0.000     .0575461    .1406167
+     age70up |   .1577795   .0202122     7.81   0.000     .1181644    .1973946
+        male |  -.0864822   .0115769    -7.47   0.000    -.1091724    -.063792
+   logincome |   .0008898   .0073512     0.12   0.904    -.0135184     .015298
+       mcity |   .0255239   .0115261     2.21   0.027     .0029332    .0481146
+        poor |   .3461459    .024363    14.21   0.000     .2983953    .3938965
+        fair |   .2706884   .0210598    12.85   0.000     .2294119    .3119648
+        good |   .1244945   .0193996     6.42   0.000      .086472     .162517
+    verygood |    .038418   .0194173     1.98   0.048     .0003607    .0764753
+------------------------------------------------------------------------------
+
+. 
+. //Predict number of visits using Negative Binomial model
+. //(Task A question 2 table 2 part 1)
+. 
+. predict nb_gpvisit, n
+
+. sum gpvisit nb_gpvisit
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+     gpvisit |     10,000       .2878    .5718425          0          3
+  nb_gpvisit |     10,000    .2879627    .1673868   .1242545   1.062953
+
+. 
+. //Predicted probability of counts (Task A question 2 table 2 part 3)
+. //(need to install st0002.pkg here)
+. 
+. prcounts nb_visits, max(3)
+
+. sum nb_visitspr0 nb_visitspr1 nb_visitspr2 nb_visitspr3
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nb_visitspr0 |     10,000    .7638159    .1049704   .3705998   .8840749
+nb_visitspr1 |     10,000    .1935873    .0613527     .10802   .3445235
+nb_visitspr2 |     10,000    .0350985    .0326169   .0074991   .1814875
+nb_visitspr3 |     10,000    .0061306    .0104515   .0003887    .071481
+
+. 
+. //Task A Question 3
+. //Compare my results to those in lecture slides.
+. 
+. //First for the regression results.
+. //Variables named 'age3039, age4049, age5059, logincome, verygood' are all
+. //insignificant at 10% significance level in my results for all three models, 
+. //while only 'age3039' and 'age4049' are insignificant in lecture notes.
+. //I think this is mainly due to two reasons. The first one is the randomness 
+. //caused by the sampling. We use a subset of the whole dataset, so it is 
+. //reasonable to have slightly different results. 
+. //The second one, which is more important, is related to the fact that the
+. //'logincome' is not linearly correlated with 'GP visits'. To reproduce the
+. //output, we put the 'logincome' into all models without adjustment. However, 
+. //the main information of the impact of 'logincome' was all left in the
+. //residuals of the regressions, which also caused the superficial insignificance
+. //of the 'logincome' itself. What's more, people aged from 30 to 59 are often
+. //the people who have the highest houldhold income, and people aged above or 
+. //below often earn less, therefore these variables are obviously correlated with  
+. //residuals. Hence, it is likely that our estimation of age variables are 
+. //biased and inconsistent. Also, since lecture slides omitted the lowest income
+. //level as discussed above, although its estimates are also biased and 
+. //inconsistent, they are slightly different bias as mine.
+. //Same reasoning applies to the difference between the sign and magnitude of my 
+. //results and the ones in slides. So while all my regressions estimate a 
+. //positive effect of log(income) on GP visits, all models in lecture notes 
+. //estimate them as nagetive. 
+. //As for estimated coefficients of 'gender', 'living in cities or not' and 
+. //'self-reported health' are all similar between my results and slides for all
+. //three models. This is probably because these factors are not as strongly 
+. //correlated with income as age. Their estimated marginal effects for Poisson 
+. //and Negative Binomial from my results are very similar to slides too.
+. 
+. //To deal with the non-linearity of log(income), I think we can use dummy 
+. //variables for different income level instead of treating it as continous.
+. 
+. 
+. log close 
+      name:  <unnamed>
+       log:  /Users/stanza/Documents/GitHub/ETC4420/TaskA.log
+  log type:  text
+ closed on:  13 May 2018, 21:06:56
+------------------------------------------------------------------------------------
