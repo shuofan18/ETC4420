@@ -15,9 +15,48 @@ toc: yes
 
 # Introduction
 
-# Data description
+## Motivation of this study
+Healthcare is one the most important topics in almost every country. An efficient combination of services from public and private health institutions in a country can certainly facilitate the development in that country and also enhance its residents' welfare. Given people's behavior in healthcare relies heavily on the health insurance coverage, government policy could play a significant role in this scenario. For example, policies encouraging people to buy private health insurance (PHI) can also increase the private hospital usage. Hence, the study of how policies impact individuals' decision on purchasing PHI becomes more and more important. Having accurate estimations of the marginal effect of certain policies on the PHI purhcasing decision would be extremely useful for government to make right decisions in the future. 
+As for the statement that "people's behavior in healthcare relies heavily on the health insurance coverage", it is intuitively true. But we still want to confirm its validation, what's more, we want to study to what extend does the health insurance coverage affect the individuals' beheviors. For ease of exposition, only the relationship between the utilization of dental service and the PHI status will be studied in this paper. But the results can be generalized to other cases including private health service usage etc.
 
-# 
+## Problem statement
+Therefore, in this study, we mainly want to find the answers for these two questions, what and how are the factors affecting Australian individuals' decision on PHI purchase? Is an individual's dental service usage affected by his/her PHI status? To be more specific, we will discuss these two questions separately in the following paper.
+
+1.
+
+2. We are interested in the question that how "having private health insurance" would affect an individual's behavior on health service utilisation. More specifically, we want to find out the treatment effect of "having private private heal insurance" on dentist visit (binary dependent variable). 
+
+## Literature review
+blabla
+## Data description
+The data we use in this study is a randomly selected sample of 25,089 individuals from the 2004/05 Australian National Health Survey (NHS). 
+
+# Model
+
+
+## XXXX Model
+### model specification and description
+### explanatory variables
+### output
+## XXXx model
+
+# Discussion
+
+for the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model caused by the self-selection. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. The regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
