@@ -16,29 +16,42 @@ toc: yes
 # Introduction
 
 ## Motivation of this study
+
 Healthcare is one the most important topics in almost every country. An efficient combination of services from public and private health institutions in a country can certainly facilitate the development in that country and also enhance its residents' welfare. Given people's behavior in healthcare relies heavily on the health insurance coverage, government policy could play a significant role in this scenario. For example, policies encouraging people to buy private health insurance (PHI) can also increase the private hospital usage. Hence, the study of how policies impact individuals' decision on purchasing PHI becomes more and more important. Having accurate estimations of the marginal effect of certain policies on the PHI purhcasing decision would be extremely useful for government to make right decisions in the future. 
 As for the statement that "people's behavior in healthcare relies heavily on the health insurance coverage", it is intuitively true. But we still want to confirm its validation, what's more, we want to study to what extend does the health insurance coverage affect the individuals' beheviors. For ease of exposition, only the relationship between the utilization of dental service and the PHI status will be studied in this paper. But the results can be generalized to other cases including private health service usage etc.
 
 ## Problem statement
-Therefore, in this study, we mainly want to find the answers for these two questions, what and how are the factors affecting Australian individuals' decision on PHI purchase? Is an individual's dental service usage affected by his/her PHI status? To be more specific, we will discuss these two questions separately in the following paper.
 
-1.
+Therefore, in this study, we mainly want to answer two questions. Firstly, what are the determinants of Australian individuals' decision on PHI purchase and how are these determinants affecting the people's choices? Secondly, is an individual's dental service usage affected by his/her PHI status? We will discuss these two questions separately in the following paper.
+<!--
+1. First, we need to check if the policy alter people's decision on PHI purchase at all. If it does, we then need to find out the marginal effect of that policy after controlling for personal related factors. 
 
 2. We are interested in the question that how "having private health insurance" would affect an individual's behavior on health service utilisation. More specifically, we want to find out the treatment effect of "having private private heal insurance" on dentist visit (binary dependent variable). 
+-->
 
-## Literature review
-blabla
-## Data description
-The data we use in this study is a randomly selected sample of 25,089 individuals from the 2004/05 Australian National Health Survey (NHS). 
+## Literature review  
 
-# Model
+Although a lot of studies have been conducted relating the demand for private health insurance, not much of them asked the question about how PHI is affecting the healthcare utilisation. In terms of dental health services, there are even fewer. [@XY2008]
+Related to our second question in this study, @DK2004 found that making more people purchase PHI does not necessarily increase the utility of the private health services. 
 
+Preety and Xueyan studied the impact of private health insurance on the individuals' choice of public versus private hospital services in @XY2008.
+
+
+
+
+
+# Econometric Model
 
 ## XXXX Model
+
 ### model specification and description
 ### explanatory variables
 ### output
 ## XXXx model
+
+# Data  
+
+The data we use in this study is a randomly selected sample of 25,089 individuals from the 2004/05 Australian National Health Survey (NHS). 
 
 # Discussion
 
