@@ -18,68 +18,89 @@ toc: yes
 ## Motivation of this study
 
 Healthcare is one the most important topics in almost every country. An efficient combination of services from public and private health institutions in a country can certainly facilitate the development in that country and also enhance its residents' welfare. Given people's behavior in healthcare relies heavily on the health insurance coverage, government policy could play a significant role in this scenario. For example, policies encouraging people to buy private health insurance (PHI) can also increase the private hospital usage. Hence, the study of how policies impact individuals' decision on purchasing PHI becomes more and more important. Having accurate estimations of the marginal effect of certain policies on the PHI purhcasing decision would be extremely useful for government to make right decisions in the future. 
-As for the statement that "people's behavior in healthcare relies heavily on the health insurance coverage", it is intuitively true. But we still want to confirm its validation, what's more, we want to study to what extend does the health insurance coverage affect the individuals' beheviors. For ease of exposition, only the relationship between the utilization of dental service and the PHI status will be studied in this paper. But the results can be generalized to other cases including private health service usage etc.
+As for the statement that "people's behavior in healthcare relies heavily on the health insurance coverage", it is intuitively true. But we still need to confirm its validation. What's more, we want to study to what extend does the health insurance coverage affect the individuals' beheviors. For ease of exposition, only the relationship between the utilization of dental service and the PHI status will be studied in this paper. But the results can be generalized to other cases including private health service usage etc.
 
 ## Problem statement
 
-Therefore, in this study, we mainly want to answer two questions. Firstly, what are the determinants of Australian individuals' decision on PHI purchase and how are these determinants affecting the people's choices? Secondly, is an individual's dental service usage affected by his/her PHI status? We will discuss these two questions separately in the following paper.
-<!--
-1. First, we need to check if the policy alter people's decision on PHI purchase at all. If it does, we then need to find out the marginal effect of that policy after controlling for personal related factors. 
+Therefore, in this study, we are interested in two questions. 
 
-2. We are interested in the question that how "having private health insurance" would affect an individual's behavior on health service utilisation. More specifically, we want to find out the treatment effect of "having private private heal insurance" on dentist visit (binary dependent variable). 
--->
+Firstly, what are the determinants of Australian individuals' decision on PHI purchase and how are these determinants affecting the people's choices? 
+Secondly, is an individual's dental service usage affected by his/her PHI status? More specifically, we want to find out the treatment effect of "having private private heal insurance" on dental service usage. We will discuss these two questions separately in the following paper.
 
 ## Literature review  
 
-Although a lot of studies have been conducted relating the demand for private health insurance, not much of them asked the question about how PHI is affecting the healthcare utilisation. In terms of dental health services, there are even fewer. [@XY2008]
-Related to our second question in this study, @DK2004 found that making more people purchase PHI does not necessarily increase the utility of the private health services. 
+Despite of the fact that a lot of studies have been conducted relating the demand for private health insurance, not much of them asked the question about how PHI is affecting the healthcare utilisation. [@XY2008] In terms of dental health services, there are even fewer. Related to our second question in this study, @DK2004 found that making more people purchase PHI does not necessarily increase the utility of the private health services. 
 
-Preety and Xueyan studied the impact of private health insurance on the individuals' choice of public versus private hospital services in @XY2008.
+Although @XY2008 studied the impact of private health insurance on the individuals' choice of public versus private hospital services, not directly relate to the dental care service, the methodology, RUM analysis and the recursive trivariate probit system model, used in their paper shed light on this study. 
 
+According to @oral2016, "in 2013, half (50%) of people aged 5 and over had some level of private health insurance with dental cover. More people living in Major cities (53%) had insurance than in Inner regional (45%) and Outer regional areas (44%). People living in lower income households were less likely to have dental insurance than those in higher income households. Most (77%) adults with some level of health insurance that covered dental made co-contributions towards the cost of dental visits. One (1) in 10 insured adults (10%) paid all their own expenses. Of these, approximately 19% reported that this caused a large financial burden. Total expenditure on dental services (except those in hospitals) in Australia was AUD 8,706 million  in 2012–13, an increase from AUD 5,945 million (adjusted for inflation) in 2002–03. The largest source of funds for this overall dental expenditure was individuals, paying directly out of pocket for 58% of total dental costs."
 
+# Econometric Framework
 
+## Multinomial logit
 
+The different types of PHI have no apparent natural order. We use Multinomial Logit (MNL) to model it.
 
-# Econometric Model
+Suppose the utility for individual $i$ choosing choice $j$ is given by:
 
-## XXXx model
+$$U_{ij}=x_i'\ \beta_j + \epsilon_{ij}\ \ (i=1,\dots,N;\ \ j=0,1,\dots,J)$$
+where $x_i$ only vary by $i$ and are the same across j, and $\beta_j$ differs by choice j.
+We observe $y_i=j \ \ \text{iff.} U_{ij}>U_{ik}\ \  \forall k \neq j (j,k=0,1,\dots,J)$, using a Type I extreme value distribution with $F(\epsilon_{ij}=\exp[-\exp(-\epsilon_{ij})]$. Probabilities:
+$$P_{ij}=P(y_i=j)=\frac{e^{x_i'\beta_j}}{\sum_{k=0}^J e^{x_i' \beta_j}} \ \ \ (j=0,1,\dots,J)$$
+where $\beta_0$ is standardized to be zero. So 
+$$P_{i0}=P(y_i=0|x_i)=\frac{1}{1+\sum_{k=1}^J e^{x_i'\beta_k}}$$
+$$P_{ij}=P(y_i=j|x_i)=\frac{e^{x_i'\beta_k}}{1+\sum_{k=1}^J e^{x_i'\beta_k}}$$
+J=3 in this study.
 
 ## Endogenous binary treatment for a binary outcome variable - EBVP
 
-For the second question in this study, the EBVP model is used. Because the main outcome variable "whether having visited a dentist in past 12 months" (y) is a binary variable. The treatment variable "whether having PHI" is also a binary variable and it is endogenous. The model structure is given by:
+For the second question in this study, the EBVP model is used. Because the main outcome variable "whether having visited a dentist in past 12 months" (y) is a binary variable. The treatment variable "whether having PHI" (T) is also a binary variable and it is endogenous. The model structure is given by:
 
 $$y^*_i = x_{i1}' \beta_1 + \delta T_i + \epsilon_{i1},
-\ \ y_i=1\ \text{if}\ y_i^*>0, \ y_i=0\ \text{otherwise}
-\\ T_i^* = x_{i2}' \beta_2 + \epsilon{i2}, \ T_i=1\ \text{if}\ T_i^*>0,
-\ T_i=0\ \text{otherwise}
-\\ \text{where} (\epsilon_{i1}, \epsilon_{i2}) \sim BVN(0,0,1,1,\rho)
-, \ -1<\rho<1
-\\ \rho\ \text{is the correlation coefficient between}\ \epsilon_{i1} \text{and} \epsilon_{i2}$$
+\ \ y_i=1\ \text{if}\ y_i^*>0, \ y_i=0\ \text{otherwise}$$
+
+$$T_i^* = x_{i2}' \beta_2 + \epsilon{i2}, \ T_i=1\ \text{if}\ T_i^*>0,
+\ T_i=0\ \text{otherwise}$$
+
+$$\text{where} (\epsilon_{i1}, \epsilon_{i2}) \sim BVN(0,0,1,1,\rho)
+, \ -1<\rho<1$$
+$$\rho\ \text{is the correlation coefficient between}\ \epsilon_{i1} \text{and} \epsilon_{i2}$$
  
 We will use the Maximum likelihood estimation because it gives consistent and efficient estimates. The log-likelihood function is
-$$LogL=
-\sum_{y=1,T=1}  log\ \Phi_2 [x_{i1}'\beta_1+\delta T_i,\
-x_{i2}'\beta_2,\ \rho]
-+\sum_{y=1,T=0}  log\ \Phi_2 [x_{i1}'\beta_1,\
--x_{i2}'\beta_2,\ -\rho]
-+\sum_{y=0,T=1}  log\ \Phi_2 [-x_{i1}'\beta_1+\delta T_i,\
-x_{i2}'\beta_2,\ -\rho]
-+\sum_{y=0,T=0}  log\ \Phi_2 [-x_{i1}'\beta_1,\
--x_{i2}'\beta_2,\ \rho]$$
+\begin{align} 
+LogL &=  \sum_{y=1,T=1}  log\ \Phi_2 [x_{i1}'\beta_1+\delta T_i,\ x_{i2}'\beta_2,\ \rho]
++\sum_{y=1,T=0}  log\ \Phi_2 [x_{i1}'\beta_1,\ -x_{i2}'\beta_2,\ -\rho]
+\\ & +\sum_{y=0,T=1}  log\ \Phi_2 [-x_{i1}'\beta_1+\delta T_i,\ x_{i2}'\beta_2,\ -\rho]
++\sum_{y=0,T=0}  log\ \Phi_2 [-x_{i1}'\beta_1,\ -x_{i2}'\beta_2,\ \rho]
+\end{align}
+
 Results of interest: treatment effect of T on y:
+
 $$TE_i=\Phi(x_{i1}'\beta_1+\delta)
 -\Phi(x_{i1}'\beta_1)
 $$
 
 # Data  
 
-The data we use in this study is a randomly selected sample of 25,089 individuals from the 2004/05 Australian National Health Survey (NHS). 
+Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. 
+
+The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
+
+```{r datadef}
+variables <- read.csv("~/documents/github/etc4420/var_def.csv")
+
+```
+
+# Results
+
+# Conclusion
 
 # Discussion
 
-For the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be correlated with the error term in the outcome Y (dentist visits) equation. 
+For the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. And if this is the case, the effect of having PHI will be overestimated. 
 
 
+# References
 
 
 
