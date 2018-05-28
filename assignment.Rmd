@@ -42,12 +42,34 @@ Preety and Xueyan studied the impact of private health insurance on the individu
 
 # Econometric Model
 
-## XXXX Model
-
-### model specification and description
-### explanatory variables
-### output
 ## XXXx model
+
+## Endogenous binary treatment for a binary outcome variable - EBVP
+
+For the second question in this study, the EBVP model is used. Because the main outcome variable "whether having visited a dentist in past 12 months" (y) is a binary variable. The treatment variable "whether having PHI" is also a binary variable and it is endogenous. The model structure is given by:
+
+$$y^*_i = x_{i1}' \beta_1 + \delta T_i + \epsilon_{i1},
+\ \ y_i=1\ \text{if}\ y_i^*>0, \ y_i=0\ \text{otherwise}
+\\ T_i^* = x_{i2}' \beta_2 + \epsilon{i2}, \ T_i=1\ \text{if}\ T_i^*>0,
+\ T_i=0\ \text{otherwise}
+\\ \text{where} (\epsilon_{i1}, \epsilon_{i2}) \sim BVN(0,0,1,1,\rho)
+, \ -1<\rho<1
+\\ \rho\ \text{is the correlation coefficient between}\ \epsilon_{i1} \text{and} \epsilon_{i2}$$
+ 
+We will use the Maximum likelihood estimation because it gives consistent and efficient estimates. The log-likelihood function is
+$$LogL=
+\sum_{y=1,T=1}  log\ \Phi_2 [x_{i1}'\beta_1+\delta T_i,\
+x_{i2}'\beta_2,\ \rho]
++\sum_{y=1,T=0}  log\ \Phi_2 [x_{i1}'\beta_1,\
+-x_{i2}'\beta_2,\ -\rho]
++\sum_{y=0,T=1}  log\ \Phi_2 [-x_{i1}'\beta_1+\delta T_i,\
+x_{i2}'\beta_2,\ -\rho]
++\sum_{y=0,T=0}  log\ \Phi_2 [-x_{i1}'\beta_1,\
+-x_{i2}'\beta_2,\ \rho]$$
+Results of interest: treatment effect of T on y:
+$$TE_i=\Phi(x_{i1}'\beta_1+\delta)
+-\Phi(x_{i1}'\beta_1)
+$$
 
 # Data  
 
@@ -55,7 +77,7 @@ The data we use in this study is a randomly selected sample of 25,089 individual
 
 # Discussion
 
-for the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model caused by the self-selection. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. The regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. 
+For the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be correlated with the error term in the outcome Y (dentist visits) equation. 
 
 
 
