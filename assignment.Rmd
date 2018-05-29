@@ -34,8 +34,9 @@ Despite of the fact that a lot of studies have been conducted relating the deman
 
 Although @XY2008 studied the impact of private health insurance on the individuals' choice of public versus private hospital services, not directly relate to the dental care service, the methodology, RUM analysis and the recursive trivariate probit system model, used in their paper shed light on this study. 
 
-However, it is also worth noting that "having PHI which covers dental service" does not necessarily mean "paying nothing" for insured people. To illustrate this, please refer to figure \ref{fig:introfig1}. According to @oral2016, "in 2013, half (50%) of people aged 5 and over had some level of private health insurance with dental cover. More people living in Major cities (53%) had insurance than in Inner regional (45%) and Outer regional areas (44%). People living in lower income households were less likely to have dental insurance than those in higher income households. Most (77%) adults with some level of health insurance that covered dental made co-contributions towards the cost of dental visits. One (1) in 10 insured adults (10%) paid all their own expenses. Of these, approximately 19% reported that this caused a large financial burden. Total expenditure on dental services (except those in hospitals) in Australia was AUD 8,706 million  in 2012–13, an increase from AUD 5,945 million (adjusted for inflation) in 2002–03. The largest source of funds for this overall dental expenditure was individuals, paying directly out of pocket for 58% of total dental costs." Hence, maybe the question is more interesting to researchers is the impact of "all free dental service" on "dental visits". And this needs more care than simply using PHI status.
-```{r introfig1, echo=FALSE, fig.align='center', fig.cap="A description of the co-payment paid by insured people in 2013.", fig.retina=NULL, message=FALSE, warning=FALSE, out.width='100%', paged.print=FALSE}
+However, it is also worth noting that "having PHI which covers dental service" does not necessarily mean "paying nothing" for insured people. To illustrate this, please refer to figure \ref{fig:introfig1}. According to @oral2016, "in 2013, half (50%) of people aged 5 and over had some level of private health insurance with dental cover. More people living in Major cities (53%) had insurance than in Inner regional (45%) and Outer regional areas (44%). People living in lower income households were less likely to have dental insurance than those in higher income households. Most (77%) adults with some level of health insurance that covered dental made co-contributions towards the cost of dental visits. One (1) in 10 insured adults (10%) paid all their own expenses. Of these, approximately 19% reported that this caused a large financial burden. Total expenditure on dental services (except those in hospitals) in Australia was AUD 8,706 million  in 2012–13, an increase from AUD 5,945 million (adjusted for inflation) in 2002–03. The largest source of funds for this overall dental expenditure was individuals, paying directly out of pocket for 58% of total dental costs." Hence, maybe the question more interesting to researchers is the impact of "all free dental service" on "dental visits". And this needs more care than simply using PHI status.
+
+```{r introfig1, echo=FALSE, out.width='60%', fig.align='center', fig.cap="A description of the co-payment paid by insured people in 2013.", fig.retina=NULL, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(knitr)
 include_graphics("~/documents/github/etc4420/intro.png")
 ```
@@ -55,7 +56,7 @@ $$P_{ij}=P(y_i=j)=\frac{e^{x_i'\beta_j}}{\sum_{k=0}^J e^{x_i' \beta_j}} \ \ \ (j
 where $\beta_0$ is standardized to be zero. So 
 $$P_{i0}=P(y_i=0|x_i)=\frac{1}{1+\sum_{k=1}^J e^{x_i'\beta_k}}$$
 $$P_{ij}=P(y_i=j|x_i)=\frac{e^{x_i'\beta_k}}{1+\sum_{k=1}^J e^{x_i'\beta_k}}$$
-J=3 in this study.
+J=3 in this study. Since there are 4 (J+1=4) types of insurance status. The x variables used in this model are defined in data section, and can also be found in the output table.
 
 ## Endogenous binary treatment for a binary outcome variable - EBVP
 
@@ -102,7 +103,7 @@ pandoc.table(variables, split.cell = 100, split.table = Inf, caption="Definition
 
 # Results
 
-Because the coefficients obtained in MNL has no meaningful interpretation, neither does its sign. Hence we do not report its estimation in this paper. The table below is the average marginal effect obtained from MNL.
+Because the coefficients obtained in MNL has no meaningful interpretation, neither does its sign. Hence we do not report its estimation in this paper. The table 2 is the average marginal effect obtained from MNL.
 
 ```{r memnl, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(tidyverse)
@@ -120,8 +121,12 @@ colnames(ame) <- c(" ","dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)")
 kable(ame, caption="Average Marginal Effects obtained from MNL for the first question") %>%
   add_header_above(c("Variables" = 1, "Y=0" = 1, "Y=1" = 1, "Y=2" = 1, "Y=3"=1))
 ```
+Average Predicted Probability are computed as shown in the table below.
 
-
+```{r q2fig1, echo=FALSE, fig.align='center', fig.cap="Output from EBVP for the 2nd question.", fig.retina=NULL, message=FALSE, warning=FALSE, fig.width=8, paged.print=FALSE}
+library(knitr)
+include_graphics("~/documents/github/etc4420/dvisit.png")
+```
 
 # Conclusion
 
@@ -129,7 +134,9 @@ kable(ame, caption="Average Marginal Effects obtained from MNL for the first que
 
 # Discussion
 
-For the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. And if this is the case, the effect of having PHI will be overestimated. 
+Firstly we need to acknowledge the limitation of this study in that the data we have is not very big. What's more, many features that could have contributed to this study are not included in this subset. For instance, if we have information on individuals' other insurance purchasing status, we could use it as an IV in our second regression to address the endogeneity problem. Because highly "risk-averse" people are more likely to buy other types of insurance such as life insurance. And this type of insurance has no direct effect on dental visits whatsoever. In addition, related to what we have discussed in introduction, "having coverage on dental service" often does not equal to "free dental service". Based on different insurance policy, people still need to pay a lot of money to get dental care. This is another pitfall for us to fully study the impact of PHI on dental visits. To properly study this point, we may need to do some research on some functional form between having PHI and the co-payment made for dental care.
+
+A good feature of this data set is that it was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. And if this is the case, the effect of having PHI will be overestimated. 
 
 However, we acknowledge the limitation of this arrangement.
 
