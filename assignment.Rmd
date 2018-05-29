@@ -17,7 +17,7 @@ toc: yes
 
 ## Motivation of this study
 
-Healthcare is one the most important topics in almost every country. An efficient combination of services from public and private health institutions in a country can certainly facilitate the development in that country and also enhance its residents' welfare. Given people's behavior in healthcare relies heavily on the health insurance coverage, government policy could play a significant role in this scenario. For example, policies encouraging people to buy private health insurance (PHI) can also increase the private hospital usage. Hence, the study of how policies impact individuals' decision on purchasing PHI becomes more and more important. Having accurate estimations of the marginal effect of certain policies on the PHI purhcasing decision would be extremely useful for government to make right decisions in the future. 
+Healthcare is one the most important topics in almost every country. An efficient combination of services from public and private health institutions in a country can certainly facilitate the development in that country and also enhance its residents' welfare. Given people's behavior in healthcare relies heavily on the health insurance coverage, government policy could play a significant role in this scenario. For example, policies encouraging people to buy Private Health Insurance (PHI) can also increase the private hospital usage. Hence, the study of how policies impact individuals' decision on purchasing PHI becomes more and more important. Having accurate estimations of the marginal effect of certain policies on the PHI purhcasing decision would be extremely useful for government to make right decisions in the future. 
 As for the statement that "people's behavior in healthcare relies heavily on the health insurance coverage", it is intuitively true. But we still need to confirm its validation. What's more, we want to study to what extend does the health insurance coverage affect the individuals' beheviors. For ease of exposition, only the relationship between the utilization of dental service and the PHI status will be studied in this paper. But the results can be generalized to other cases including private health service usage etc.
 
 ## Problem statement
@@ -25,6 +25,7 @@ As for the statement that "people's behavior in healthcare relies heavily on the
 Therefore, in this study, we are interested in two questions. 
 
 Firstly, what are the determinants of Australian individuals' decision on PHI purchase and how are these determinants affecting the people's choices? 
+
 Secondly, is an individual's dental service usage affected by his/her PHI status? More specifically, we want to find out the treatment effect of "having private private heal insurance" on dental service usage. We will discuss these two questions separately in the following paper.
 
 ## Literature review  
@@ -58,7 +59,7 @@ J=3 in this study.
 
 ## Endogenous binary treatment for a binary outcome variable - EBVP
 
-For the second question in this study, the EBVP model is used. Because the main outcome variable "whether having visited a dentist in past 12 months" (y) is a binary variable. The treatment variable "whether having PHI" (T) is also a binary variable and it is endogenous. The model structure is given by:
+For the second question in this study, the EBVP model is used. Because the main outcome variable "whether having visited a dentist in past 12 months" (y) is a binary variable. The treatment variable "whether having PHI" (T) is also a binary variable and it is endogenous because of the "self-selection" issues described in the discussion section. The model structure is given by:
 
 $$y^*_i = x_{i1}' \beta_1 + \delta T_i + \epsilon_{i1},
 \ \ y_i=1\ \text{if}\ y_i^*>0, \ y_i=0\ \text{otherwise}$$
@@ -88,7 +89,9 @@ $$
 
 Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
 
-To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years. 
+To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years because lack of information for people aged 14 years and below. What's more, from the cross tabulation with percentage between age band and types of PHI, we found that there are some consecutive age band having very similar distribution against types of PHI. Hence, we double checked the cross tabulation between original age band with dental visits. It turned out that we will not lose much information by doing re-grouping to the age band according to its behavior. Hence, we re-grouped the age band into six groups as given in the "definition of variables" table below and the first group "age 0-14" will be omitted from all regressions in this study.
+
+Intuitively thinking, the dental visit has to be correlated with age and life style factors such as smoking and drinking behavior. Because these factors are more likely to cause dental issues. What's more, other demographic may also have impact on the dental visits behavior, so we will also include the ones used in the first question.
 
 ```{r datadef, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(gdata)
@@ -97,9 +100,10 @@ variables <- read.xls("~/documents/github/etc4420/variables.xls", header=T)
 pandoc.table(variables, split.cell = 100, split.table = Inf, caption="Definition of variables", justify='left', keep.line.breaks = TRUE)
 ```
 
+
 # Results
 
-
+Because the coefficients obtained in MNL has no meaningful interpretation, neither does its sign. Hence we do not report its estimation in this paper. The table below is the average marginal effect obtained from MNL.
 
 ```{r memnl, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(tidyverse)
@@ -114,7 +118,7 @@ memnl3 <- paste(memnl$V7, " ", "(", memnl$V8, ")")
 ame <- tibble(memnl0,memnl1,memnl2,memnl3)
 ame <- cbind(meva, ame)
 colnames(ame) <- c(" ","dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)")
-kable(ame, caption="Average Marginal Effects") %>%
+kable(ame, caption="Average Marginal Effects obtained from MNL for the first question") %>%
   add_header_above(c("Variables" = 1, "Y=0" = 1, "Y=1" = 1, "Y=2" = 1, "Y=3"=1))
 ```
 
@@ -130,6 +134,16 @@ kable(ame, caption="Average Marginal Effects") %>%
 
 For the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. And if this is the case, the effect of having PHI will be overestimated. 
 
+# Appendix
+
+```{r crosstab, echo=F, message=FALSE, warning=FALSE, results='asis'}
+
+crossphi <- read.xls("~/documents/github/etc4420/crosstab.xls", header=T, sheet = 1)
+kable(crossphi, col.names = c("Years", "PHI=0","PHI=1","PHI=2","PHI=3","Total"), caption = "Cross tabulation between age and PHI types")
+
+crossden <- read.xls("~/documents/github/etc4420/crosstab.xls", header=T, sheet = 2)
+kable(crossden, col.names = c("Years", "Dental visits=0", "Dental visits=1", "Total"), caption = "Cross tabulation between age and dental visits")
+```
 
 # References
 
