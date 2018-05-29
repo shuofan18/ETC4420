@@ -2,9 +2,13 @@ clear
 //cd /Users/stanza/Downloads
 cd \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420
 use "PHI.dta", replace
-******************First question*************************
 set seed 27886913
 sample 22000, count
+
+*********************************************************
+******************First question*************************
+*********************************************************
+
 //check data summary statistics
 sum
 tab hicvrtyp //tabulation of the dependent variable for 1st question
@@ -18,17 +22,15 @@ tab agecb
 //age band. common sense of relationship between age and dental condition is 
 //also consistent with this re-group
 tab agecb oralq4cb, row
-gen age4=0 //(not applicable 1st question)
-gen age59=0  //(not applicable 1st question)
-gen age1014=0  //(not applicable 1st question)
+gen age14=0 //(not applicable 1st question)
 gen age1519=0  //(ref.level 1st question)
 gen age2039=0
 gen age4064=0
 gen age6579=0
 gen age80=0
-replace age4=1 if agecb==1
-replace age59=1 if agecb==2
-replace age1014=1 if agecb==3
+replace age14=1 if agecb==1
+replace age14=1 if agecb==2
+replace age14=1 if agecb==3
 replace age1519=1 if agecb==4
 replace age2039=1 if agecb==5
 replace age2039=1 if agecb==6
@@ -120,12 +122,6 @@ replace income10=1 if incdecpn==10
 mlogit phi age2039 age4064 age6579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
-margins, dydx(*) atmean //MEM
-
-quitely mlogit phi age2039 age4064 age6579 age80 Australia /*
-*/English male married condno excelh verygood good fair degree dipcert /*
-*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
-margins, dydx(*) //AME
 
 quitely mlogit phi age2039 age4064 age6579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
@@ -136,6 +132,7 @@ predict pp2, outcome(2)
 predict pp3, outcome(3)
 sum pp0 pp1 pp2 pp3 //estimated probabilities
 
+//AME of MNL
 quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
@@ -153,14 +150,56 @@ quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 margins, dydx(*) predict(outcome(3)) post
 
+*********************************************************
+******************Second question*************************
+*********************************************************
 
-**** question 2 code**************
-*biprobit (Y = X1 X2 T) (T = Z1 Z2)
-*margins, dydx(T) predict(pmarg1)
-tab oralq4cb
+
+tab oralq4cb //check the dependent variable for second question
+//create dummy variable as dependent variable
 gen dvisit=0
 replace dvisit=1 if oralq4cb==1
 replace dvisit=1 if oralq4cb==2
+tab healinq1 //check the treatment variable 
+//create dummy variable for treatment 
+gen treat=0 if  healinq1==2
+replace treat=1 if  healinq1==1
+biprobit (dvisit = X1 X2 T) (T = Z1 Z2)
+margins, dydx(T) predict(pmarg1)
+//create dummy for smoking
+tab smkreglr
+gen nonsmoke=0  //(ref.level)
+gen exsmoke=0
+gen currentsmk=0
+gen regularsmk=0
+replace nonsmoke=1 if smkreglr==4
+replace exsmoke=1 if smkreglr==3
+replace currentsmk=1 if smkreglr==2
+replace regularsmk=1 if smkreglr==1
+//create dummy for drinking 
+tab al2k7day
+gen low=0 //(ref.level)
+gen medium=0
+gen high=0
+replace low=1 if al2k7day==1
+replace low=1 if al2k7day==5
+replace low=1 if al2k7day==6
+replace medium=1 if al2k7day==2
+replace medium=1 if al2k7day==4
+
+biprobit (Y = X1 X2 T) (T = Z1 Z2)
+margins, dydx(T) predict(pmarg1)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
