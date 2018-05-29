@@ -91,7 +91,7 @@ Our data source is the 2004-05 Australian National Health Survey (NHS) which was
 
 To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years because lack of information for people aged 14 years and below. What's more, from the cross tabulation with percentage between age band and types of PHI, we found that there are some consecutive age band having very similar distribution against types of PHI. Hence, we double checked the cross tabulation between original age band with dental visits. It turned out that we will not lose much information by doing re-grouping to the age band according to its behavior. Hence, we re-grouped the age band into six groups as given in the "definition of variables" table below and the first group "age 0-14" will be omitted from all regressions in this study.
 
-Intuitively thinking, the dental visit has to be correlated with age and life style factors such as smoking and drinking behavior. Because these factors are more likely to cause dental issues. What's more, other demographic may also have impact on the dental visits behavior, so we will also include the ones used in the first question.
+Intuitively thinking, the dental visit has to be correlated with age and life style factors such as smoking and drinking behavior. Because these factors are more likely to cause dental issues. What's more, other demographic may also have impact on the dental visits behavior, so we will also include the ones used in the first question. In summary, for the main outcome equation, we will include all variables used in the first question, and also include smoking habit and drinking behavior. As to the treatment equation, we want to include some IV variables to address the endogeneity problem for the treatment. Idealy, the instrument will be strongly correlated with the treatment eg. whether having PHI or not; but not correlated with the error terms in the main outcome equation, eg. uncorrelated with dental visits. However, given the limitation of the data we have, the only potential IV is the "number of times consulted general pratitioner". Since people often visit GP are supposed to have a higher demand for insurance, but more GP visits does not lead to more dental visits. Since the general health condition is to some extend independent with the dental health. Maybe it is the reason for the dental care service to be so independent from other departments in the medical system. So in this research, we will use this variable as an IV in the treatment equation. 
 
 ```{r datadef, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(gdata)
@@ -99,7 +99,6 @@ library(pander)
 variables <- read.xls("~/documents/github/etc4420/variables.xls", header=T)
 pandoc.table(variables, split.cell = 100, split.table = Inf, caption="Definition of variables", justify='left', keep.line.breaks = TRUE)
 ```
-
 
 # Results
 
@@ -124,8 +123,6 @@ kable(ame, caption="Average Marginal Effects obtained from MNL for the first que
 
 
 
-
-
 # Conclusion
 
 
@@ -133,6 +130,8 @@ kable(ame, caption="Average Marginal Effects obtained from MNL for the first que
 # Discussion
 
 For the second question. Because we assume this sample was randomly selected from the Australian population, both insured and uninsured people are observed. Therefore, there is no observability issue in this case. However, there may still be endogeniety problem in the model because people may "self-select" themselves into purchasing PHI. To be more specific, the unobservable factors affecting PHI self-selection may ne correlated with the factors making a person seeing a dentist. For instance, for people who are highly risk averse, the chance for them to purchase PHI is higher than other people, and it is also likely that they visit dentists more frequently to prevent possible dental disease. Since the "risk averse" characristic is unobservable, it will be left in the error terms. Thus regressor T (whether having PHI) will be positively correlated with the error term in the outcome Y (dentist visits) equation. And if this is the case, the effect of having PHI will be overestimated. 
+
+However, we acknowledge the limitation of this arrangement.
 
 # Appendix
 
