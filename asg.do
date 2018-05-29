@@ -123,7 +123,7 @@ mlogit phi age2039 age4064 age6579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 
-quitely mlogit phi age2039 age4064 age6579 age80 Australia /*
+quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 predict pp0, outcome(0)
@@ -164,8 +164,7 @@ tab healinq1 //check the treatment variable
 //create dummy variable for treatment 
 gen treat=0 if  healinq1==2
 replace treat=1 if  healinq1==1
-biprobit (dvisit = X1 X2 T) (T = Z1 Z2)
-margins, dydx(T) predict(pmarg1)
+
 //create dummy for smoking
 tab smkreglr
 gen nonsmoke=0  //(ref.level)
@@ -185,10 +184,19 @@ replace low=1 if al2k7day==1
 replace low=1 if al2k7day==5
 replace low=1 if al2k7day==6
 replace medium=1 if al2k7day==2
-replace medium=1 if al2k7day==4
+replace high=1 if al2k7day==4
+//create "times visited GP" variable
+tab docq2cb
+gen gpvisit=docq2cb
+biprobit (dvisit = age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp/*
+*/ exsmoke currentsmk regularsmk medium low treat) (treat = age2039 age4064/* 
+*/ age6579 age80 Australia gpvisit /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp)
 
-biprobit (Y = X1 X2 T) (T = Z1 Z2)
-margins, dydx(T) predict(pmarg1)
+//margins, dydx(treat) predict(pmarg1)
 
 
 
