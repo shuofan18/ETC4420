@@ -33,13 +33,17 @@ Despite of the fact that a lot of studies have been conducted relating the deman
 
 Although @XY2008 studied the impact of private health insurance on the individuals' choice of public versus private hospital services, not directly relate to the dental care service, the methodology, RUM analysis and the recursive trivariate probit system model, used in their paper shed light on this study. 
 
-According to @oral2016, "in 2013, half (50%) of people aged 5 and over had some level of private health insurance with dental cover. More people living in Major cities (53%) had insurance than in Inner regional (45%) and Outer regional areas (44%). People living in lower income households were less likely to have dental insurance than those in higher income households. Most (77%) adults with some level of health insurance that covered dental made co-contributions towards the cost of dental visits. One (1) in 10 insured adults (10%) paid all their own expenses. Of these, approximately 19% reported that this caused a large financial burden. Total expenditure on dental services (except those in hospitals) in Australia was AUD 8,706 million  in 2012–13, an increase from AUD 5,945 million (adjusted for inflation) in 2002–03. The largest source of funds for this overall dental expenditure was individuals, paying directly out of pocket for 58% of total dental costs."
+However, it is also worth noting that "having PHI which covers dental service" does not necessarily mean "paying nothing" for insured people. To illustrate this, please refer to figure \ref{fig:introfig1}. According to @oral2016, "in 2013, half (50%) of people aged 5 and over had some level of private health insurance with dental cover. More people living in Major cities (53%) had insurance than in Inner regional (45%) and Outer regional areas (44%). People living in lower income households were less likely to have dental insurance than those in higher income households. Most (77%) adults with some level of health insurance that covered dental made co-contributions towards the cost of dental visits. One (1) in 10 insured adults (10%) paid all their own expenses. Of these, approximately 19% reported that this caused a large financial burden. Total expenditure on dental services (except those in hospitals) in Australia was AUD 8,706 million  in 2012–13, an increase from AUD 5,945 million (adjusted for inflation) in 2002–03. The largest source of funds for this overall dental expenditure was individuals, paying directly out of pocket for 58% of total dental costs." Hence, maybe the question is more interesting to researchers is the impact of "all free dental service" on "dental visits". And this needs more care than simply using PHI status.
+```{r introfig1, echo=FALSE, fig.align='center', fig.cap="A, fig.retina=NULL, message=FALSE, warning=FALSE, out.width='100%', paged.print=FALSE}
+library(knitr)
+include_graphics("~/documents/github/etc4420/intro.png")
+```
 
 # Econometric Framework
 
 ## Multinomial logit
 
-The different types of PHI have no apparent natural order. We use Multinomial Logit (MNL) to model it.
+In related to our first question, there are four types of PHI status, "without PHI", "only cover hospital", "only cover ancillary" and "cover both hospital and ancillary". There are no apparent natural orders in them. And we also don't have observability issues whatsoever since our sample was randomly selected from the whole population in Australia as described in data section in this study. Therefore We use Multinomial Logit (MNL) to model it.
 
 Suppose the utility for individual $i$ choosing choice $j$ is given by:
 
@@ -84,19 +88,43 @@ $$
 
 Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
 
-To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below.
+To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years. 
 
 ```{r datadef, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(gdata)
 library(pander)
 variables <- read.xls("~/documents/github/etc4420/variables.xls", header=T)
-pandoc.table(variables, split.cell = 80, split.table = Inf, caption="Definition of variables", justify='left')
-#knitr::kable(variables)
+pandoc.table(variables, split.cell = 100, split.table = Inf, caption="Definition of variables", justify='left', keep.line.breaks = TRUE)
 ```
 
 # Results
 
+
+
+```{r memnl, echo=F, message=FALSE, warning=FALSE, results='asis'}
+library(tidyverse)
+library(kableExtra)
+library(knitr)
+memnl <- read.xls("~/documents/github/etc4420/ME.xls", header=F, sheet = 2) %>% round(digits = 3)
+meva <- read.xls("~/documents/github/etc4420/ME.xls", header=T, sheet = 1)
+memnl0 <- paste(memnl$V1, " ", "(", memnl$V2, ")")
+memnl1 <- paste(memnl$V3, " ", "(", memnl$V4, ")")
+memnl2 <- paste(memnl$V5, " ", "(", memnl$V6, ")")
+memnl3 <- paste(memnl$V7, " ", "(", memnl$V8, ")")
+ame <- tibble(memnl0,memnl1,memnl2,memnl3)
+ame <- cbind(meva, ame)
+colnames(ame) <- c(" ","dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)")
+kable(ame, caption="Average Marginal Effects") %>%
+  add_header_above(c("Variables" = 1, "Y=0" = 1, "Y=1" = 1, "Y=2" = 1, "Y=3"=1))
+```
+
+
+
+
+
 # Conclusion
+
+
 
 # Discussion
 
