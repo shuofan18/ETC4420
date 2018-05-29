@@ -87,8 +87,9 @@ Our data source is the 2004-05 Australian National Health Survey (NHS) which was
 The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
 
 ```{r datadef}
-variables <- read.csv("~/documents/github/etc4420/var_def.csv")
-
+variables <- read.csv("~/documents/github/etc4420/var_def.csv", header=TRUE)
+library(gdata)
+variables <- read.xls("~/documents/github/etc4420/variables.xls", header=FALSE)
 ```
 
 # Results
