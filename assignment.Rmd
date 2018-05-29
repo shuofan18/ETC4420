@@ -82,14 +82,16 @@ $$
 
 # Data  
 
-Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. 
+Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
 
-The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
+To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below.
 
-```{r datadef}
-variables <- read.csv("~/documents/github/etc4420/var_def.csv", header=TRUE)
+```{r datadef, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(gdata)
-variables <- read.xls("~/documents/github/etc4420/variables.xls", header=FALSE)
+library(pander)
+variables <- read.xls("~/documents/github/etc4420/variables.xls", header=T)
+pandoc.table(variables, split.cell = 80, split.table = Inf, caption="Definition of variables", justify='left')
+#knitr::kable(variables)
 ```
 
 # Results
