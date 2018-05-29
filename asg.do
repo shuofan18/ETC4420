@@ -2,7 +2,9 @@ clear
 //cd /Users/stanza/Downloads
 cd \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420
 use "PHI.dta", replace
-******************First question**************************
+******************First question*************************
+set seed 27886913
+sample 22000, count
 //check data summary statistics
 sum
 tab hicvrtyp //tabulation of the dependent variable for 1st question
@@ -16,10 +18,10 @@ tab agecb
 //age band. common sense of relationship between age and dental condition is 
 //also consistent with this re-group
 tab agecb oralq4cb, row
-gen age4=0 //(ref.level)
-gen age59=0
-gen age1014=0
-gen age1519=0
+gen age4=0 //(not applicable 1st question)
+gen age59=0  //(not applicable 1st question)
+gen age1014=0  //(not applicable 1st question)
+gen age1519=0  //(ref.level 1st question)
 gen age2039=0
 gen age4064=0
 gen age6579=0
@@ -42,6 +44,8 @@ replace age6579=1 if agecb==15
 replace age6579=1 if agecb==16
 replace age80=1 if agecb==17
 replace age80=1 if agecb==18
+//cross tab indicates age group below 14 is not applicable in the first question
+tab agecb hicvrtyp
 //dummy for gender
 tab sex
 gen male=0
@@ -54,12 +58,12 @@ replace married=0 if sms==3 //not married (ref.level)
 //dummy for work status
 tab empstabc 
 gen workft=0 
-replace workft=1 if empstabc==1 //work full time
 gen workpt=0
-replace workpt=1 if empstabc==2 //work part time
 gen unemp=0
+gen nlf=0  //(ref.level)
+replace workft=1 if empstabc==1 //work full time
+replace workpt=1 if empstabc==2 //work part time
 replace unemp=1 if empstabc==3  //unemployed
-gen nlf=0 
 replace nlf=1 if empstabc==4 //not in labour force
 //dummy for long-term condition
 tab ltcond
@@ -92,7 +96,7 @@ gen English=0
 gen Australia=0
 gen nonEng=0 //(ref.level)
 replace English=1 if cobcodcb==2
-replace Australia=0 if cobcodcb==1
+replace Australia=1 if cobcodcb==1
 replace nonEng=0 if cobcodcb==3
 //generate dummy variable for income group
 tab incdecpn
@@ -113,12 +117,41 @@ replace income8=1 if incdecpn==8
 replace income9=1 if incdecpn==9
 replace income10=1 if incdecpn==10
 //MNL model regression
-mlogit phi age59 age1014 age1519 age2039 age4064 age6579 age80 Australia /*
-*/English 
+mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+margins, dydx(*) atmean //MEM
 
+quitely mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+margins, dydx(*) //AME
 
+quitely mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+predict pp0, outcome(0)
+predict pp1, outcome(1)
+predict pp2, outcome(2)
+predict pp3, outcome(3)
+sum pp0 pp1 pp2 pp3 //estimated probabilities
 
-
+quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+margins, dydx(*) predict(outcome(0)) post
+quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+margins, dydx(*) predict(outcome(1)) post
+quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+margins, dydx(*) predict(outcome(2)) post
+quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+*/English male married condno excelh verygood good fair degree dipcert /*
+*/income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+margins, dydx(*) predict(outcome(3)) post
 
 
 **** question 2 code**************
