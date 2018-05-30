@@ -90,27 +90,29 @@ $$
 
 Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
 
-First we have a look at the dependent variable in the first question that we want to study. The types and proportion of PHI in figure \ref{fig:bartype}. It turns our in our sample almost 50% owns PHI which is consistent with the percentage in the whole population. 
+First we have a look at the dependent variable in the first question that we want to study. The types and proportion of PHI in figure 2. It turns our in our sample almost 50% owns PHI which is consistent with the percentage in the whole population. The second largest group owns "ancillary only" type of insurance. And there are some missing values in the data which we will discuss more in figure \ref{fig:barphi}.
 
-```{r bartype, echo=FALSE}
+```{r bartype, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Bar plot of the types of insurance people have in Australia", fig.height=4}
 library(foreign)
+library(tidyverse)
 dta <- read.dta("~/downloads/PHI.dta")
 colnames(dta)[15] <- "Types"
 ggplot(dta, aes(Types, fill=Types))+geom_bar()+
   xlab("Types of PHI")+
   theme(axis.text.x=element_blank())
 ```
-In addition, we also plotted the bar plot for dental visits for our second question. As we can see, the majority of people have not visited dentists in the past year while the least people have visited twice or more times.
+In addition, we also plotted the bar plot for dental visits for our second question in figure \ref{fig:barvisit}. As we can see, the majority of people have not visited dentists in the past year while the least people have visited twice or more times.
 
-```{r barvisit, echo=FALSE}
+```{r barvisit, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Bar plot of number of dental visits in the past year.",  fig.height=4}
 colnames(dta)[8] <- "Visits"
 ggplot(dta, aes(Visits, fill=Visits))+geom_bar()+
-  xlab("Number of dental visits")
+  xlab("Number of dental visits")+
+  ggtitle("Bar plot of number of dental visits in the past year.")
 ```
 
 To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years because lack of information for people aged 14 years and below as shown in figure \ref{fig:barphi}. What's more, from the cross tabulation with percentage between age band and types of PHI, we found that there are some consecutive age band having very similar distribution against types of PHI. Hence, we double checked the cross tabulation between original age band with dental visits. It turned out that we will not lose much information by doing re-grouping to the age band according to its behavior. Hence, we re-grouped the age band into six groups as given in the "definition of variables" table below and the first group "age 0-14" will be omitted from all regressions in this study.
 
-```{r barphi, echo=FALSE}
+```{r barphi, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Histogram of whether having PHI or not based on different age groups.", fig.height=6}
 colnames(dta)[13] <- "PHI"
 ggplot(dta, aes(PHI, fill=PHI))+geom_bar()+
   facet_wrap(~agecb)+theme(axis.text.x=element_blank())+
@@ -118,7 +120,9 @@ ggplot(dta, aes(PHI, fill=PHI))+geom_bar()+
 ```
 
 
-Intuitively thinking, the dental visit has to be correlated with age and life style factors such as smoking and drinking behavior. Because these factors are more likely to cause dental issues. What's more, other demographic may also have impact on the dental visits behavior, so we will also include the ones used in the first question. In summary, for the main outcome equation, we will include all variables used in the first question, and also include smoking habit and drinking behavior. As to the treatment equation, we want to include some IV variables to address the endogeneity problem for the treatment. Idealy, the instrument will be strongly correlated with the treatment eg. whether having PHI or not; but not correlated with the error terms in the main outcome equation, eg. uncorrelated with dental visits. However, given the limitation of the data we have, the only potential IV is the "number of times consulted general pratitioner". Since people often visit GP are supposed to have a higher demand for insurance, but more GP visits does not lead to more dental visits. Since the general health condition is to some extend independent with the dental health. Maybe it is the reason for the dental care service to be so independent from other departments in the medical system. So in this research, we will use this variable as an IV in the treatment equation. 
+Intuitively thinking, the dental visit has to be correlated with age and life style factors such as smoking and drinking behavior. Because these factors are more likely to cause dental issues. What's more, other demographic may also have impact on the dental visits behavior, so we will also include the ones used in the first question. In summary, for the main outcome equation, we will include all variables used in the first question, and also include smoking habit and drinking behavior. As to the treatment equation, we want to include some IV variables to address the endogeneity problem for the treatment. Idealy, the instrument will be strongly correlated with the treatment eg. whether having PHI or not; but not correlated with the error terms in the main outcome equation, eg. uncorrelated with dental visits. However, given the limitation of the data we have, the only potential IV is the "number of times consulted general pratitioner". Since people often visit GP are supposed to have a higher demand for insurance, but more GP visits does not lead to more dental visits. 
+
+Since the general health condition is to some extend independent with the dental health. Maybe it is the reason for the dental care service to be so independent from other departments in the medical system. So in this research, we will use this variable as an IV in the treatment equation. 
 
 ```{r datadef, echo=F, message=FALSE, warning=FALSE, results='asis'}
 library(gdata)
@@ -131,46 +135,52 @@ pandoc.table(variables, split.cell = 100, split.table = Inf, caption="Definition
 
 Because the coefficients obtained in MNL has no meaningful interpretation, neither does its sign. Hence we do not report its estimation in this paper. The table 2 is the average marginal effect obtained from MNL. 
 
-Some interesting findings that worthy noting here are, "poor health" does have an positive effect on "purchasing PHI" since the sign of all other health conditions are negative.
+Some interesting findings that worthy noting here are, health does have an effect on "purchasing PHI", however the sign of the "better health" relative to "poor health" do not match with our assumption. Intuitively, people with poor health are more likely to buy insurance than others. We consider the reason for this is because of the potential endogeneity problem associated with the "health varible". Because people who are highly risk averse are more likely to care more about their health, thus they are propably on balanced diet and do exercise regularly. What's more, they are also more likely to buy insurance to keep the risk away. So the unobserved risk-averse characteristic left in the error terms is both correlated with health and PHI purchasing. This is one of the reasons that our estimated marginal effects seems not reasonable. On the other hand, income levels do have the expected sign. Higher income levels people are more likely to buy insurance compared to the lower levels. Young people aged from 15-19 are more likely to have an insurance. 45 years old and above people are more likely to buy "hospital only" covered insurance. Native English-speakers are less likely to buy this type. Income level 8-10 like the "both cover" and "hospital only" types of insurance but don't like the "ancillary only" one.
 
 ```{r memnl, echo=F, message=FALSE, warning=FALSE, results='asis'}
-library(tidyverse)
 library(kableExtra)
 library(knitr)
-memnl <- read.xls("~/documents/github/etc4420/ME.xls", header=F, sheet = 2) %>% round(digits = 3)
-meva <- read.xls("~/documents/github/etc4420/ME.xls", header=T, sheet = 1)
-memnl0 <- paste(memnl$V1, " ", "(", memnl$V2, ")")
-memnl1 <- paste(memnl$V3, " ", "(", memnl$V4, ")")
-memnl2 <- paste(memnl$V5, " ", "(", memnl$V6, ")")
-memnl3 <- paste(memnl$V7, " ", "(", memnl$V8, ")")
-ame <- tibble(memnl0,memnl1,memnl2,memnl3)
-ame <- cbind(meva, ame)
+memnl <- read.xls("~/documents/github/etc4420/ME.xls", header=F, sheet = 1) 
+#meva <- read.xls("~/documents/github/etc4420/ME.xls", header=T, sheet = 1)
+memnl0 <- paste(memnl$V2, " ", "(", memnl$V3, ")")
+memnl1 <- paste(memnl$V4, " ", "(", memnl$V5, ")")
+memnl2 <- paste(memnl$V6, " ", "(", memnl$V7, ")")
+memnl3 <- paste(memnl$V8, " ", "(", memnl$V9, ")")
+ame <- tibble(memnl$V1, memnl0,memnl1,memnl2,memnl3)
 colnames(ame) <- c(" ","dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)", "dy/dx (sd)")
-kable(ame, caption="Average Marginal Effects obtained from MNL for the first question") %>%
+kable(ame, caption="Average Marginal Effects obtained from MNL for the 1st question") %>%
   add_header_above(c("Variables" = 1, "Y=0" = 1, "Y=1" = 1, "Y=2" = 1, "Y=3"=1))
 ```
-Average Predicted Probability are computed as shown in the table below. As we can see from this table, the average predicted probability is very close to the actual proportion of each type of insurance status in this data.
+Average Predicted Probability are computed as shown in the table 3. As we can see from this table, the average predicted probability is very close to the actual proportion of each type of insurance status in this data.
 
 ```{r app, echo=F, message=FALSE, warning=FALSE, results='asis'}
 app <- read.xls("~/documents/github/etc4420/app.xls", header=T, sheet = 1)
 kable(app, caption = "Average Predicted Probabilities from MNL for 1st question.")
+
 ```
+<!--
 Hit and loss function was also calculated. We can see the hit and loss table indicates the model does not have a strong prediction ability.
 
 ```{r app2, echo=F, message=FALSE, warning=FALSE, results='asis'}
 hitl <- read.xls("~/documents/github/etc4420/app.xls", header=T, sheet = 2)
 kable(hitl, caption = "Hit and Loss from MNL for 1st question.", col.names = c("PHI", "PHI hat=0", "PHI hat=3", "Total"))
 ```
-For the second question, the estimation output of EBVP can be found in the table below. As we have learned that it is very difficult to calculate the marginal effects for this kind of model. Because the non-linear recursive structure.
-<!--
-```{r q2fig1, echo=FALSE, fig.align='center', fig.cap="Output from EBVP for the 2nd question.", fig.retina=NULL, message=FALSE, warning=FALSE, fig.width=8, paged.print=FALSE}
-library(knitr)
-include_graphics("~/documents/github/etc4420/dvisit.png")
-```
+
 -->
 
+For the second question, the estimation output of EBVP can be found in the table 4 and 5 (attached at the end of this paper). As we have learned that it is very difficult to calculate the marginal effects for this kind of model. Because the non-linear recursive structure. From this estimation output though, we can still see some interesting findings. For instance, $\rho$ is negative, although very close to zero, which is inconsistent with our expectation. And also it is not significant. The reason for this is likely due to the lack of good IV as we have discussed above. We have tried to remove the IV (number of times visited GP) in the regression, and it indeed has some influence on the estimation of $\rho$ by increasing it. Hence, we believe that good IV can really help to address this problem better. As we will discuss in the next section, there are some good IVs we can refer to in the real world, however we don't have information in this data set.
 
-From this output, we can see some interesting findings. $\rho$ is negative which is inconsistent with our expectation, and also it is not significant. The reason for this is likely due to the lack of good IV as we have discussed above. We have tried to remove the IV (number of times visited GP) in the regression, and it indeed has some influence on the estimation of $\rho$ by increasing it. Hence, we believe that good IV can really help to address this problem.  
+```{r q2, echo=F, message=FALSE, warning=FALSE, results='asis'}
+q2p1 <- read.xls("~/documents/github/etc4420/q2.xls", header=F, sheet = 1)
+colnames(q2p1) <- c("variables", "Coef.", "sd", "z", "P>z", "95% lower", "95% higher")
+kable(q2p1, caption = "Model estimation of the main outcome equation from EBVP for question 2.")
+q2p2 <- read.xls("~/documents/github/etc4420/q2.xls", header=F, sheet = 2)
+colnames(q2p2) <- c("variables", "Coef.", "sd", "z", "P>z", "95% lower", "95% higher")
+kable(q2p2, caption = "Model estimation of the treatment equation from EBVP for question 2. (continued)")
+```
+
+
+
 
 # Discussion
 
