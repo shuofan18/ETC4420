@@ -1,6 +1,9 @@
 clear
-//cd /Users/stanza/Downloads
-cd \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420
+cd /Users/stanza/Downloads
+set more off
+capture log close
+log using Assignment.log,replace
+//cd \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420
 use "PHI.dta", replace
 set seed 27886913
 sample 22000, count
@@ -16,37 +19,44 @@ gen phi=0 if hicvrtyp==5 //without phi
 replace phi=1 if hicvrtyp==1 //Hospital cover only 
 replace phi=2 if hicvrtyp==2 //Ancillary cover only
 replace phi=3 if hicvrtyp==3  //Both hospital and ancillary cover
+tab agecb oralq4cb, row
 //We can see clear correlation between age and dental visits.
 tab agecb
-//too many band, age group with simlar distribution will be grouped into broader
-//age band. common sense of relationship between age and dental condition is 
-//also consistent with this re-group
-tab agecb oralq4cb, row
+//generate dummy for age groups
 gen age14=0 //(not applicable 1st question)
 gen age1519=0  //(ref.level 1st question)
-gen age2039=0
-gen age4064=0
-gen age6579=0
+gen age2024=0
+gen age2529=0
+gen age3034=0
+gen age3539=0
+gen age4044=0
+gen age4549=0
+gen age5054=0
+gen age5559=0
+gen age6064=0
+gen age6569=0
+gen age7074=0
+gen age7579=0
 gen age80=0
 replace age14=1 if agecb==1
 replace age14=1 if agecb==2
 replace age14=1 if agecb==3
 replace age1519=1 if agecb==4
-replace age2039=1 if agecb==5
-replace age2039=1 if agecb==6
-replace age2039=1 if agecb==7
-replace age2039=1 if agecb==8
-replace age4064=1 if agecb==9
-replace age4064=1 if agecb==10
-replace age4064=1 if agecb==11
-replace age4064=1 if agecb==12
-replace age4064=1 if agecb==13
-replace age6579=1 if agecb==14
-replace age6579=1 if agecb==15
-replace age6579=1 if agecb==16
+replace age2024=1 if agecb==5
+replace age2529=1 if agecb==6
+replace age3034=1 if agecb==7
+replace age3539=1 if agecb==8
+replace age4044=1 if agecb==9
+replace age4549=1 if agecb==10
+replace age5054=1 if agecb==11
+replace age5559=1 if agecb==12
+replace age6064=1 if agecb==13
+replace age6569=1 if agecb==14
+replace age7074=1 if agecb==15
+replace age7579=1 if agecb==16
 replace age80=1 if agecb==17
 replace age80=1 if agecb==18
-//cross tab indicates age group below 14 is not applicable in the first question
+//cross tab indicates age group below 14 is not applicable
 tab agecb hicvrtyp
 //dummy for gender
 tab sex
@@ -119,11 +129,13 @@ replace income8=1 if incdecpn==8
 replace income9=1 if incdecpn==9
 replace income10=1 if incdecpn==10
 //MNL model regression
-mlogit phi age2039 age4064 age6579 age80 Australia /*
+mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 
-quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 predict pp0, outcome(0)
@@ -132,23 +144,40 @@ predict pp2, outcome(2)
 predict pp3, outcome(3)
 sum pp0 pp1 pp2 pp3 //estimated probabilities
 
+//hit and loss
+gen hatphi0=pp0>=pp1 & pp0>=pp2 & pp0>=pp3
+gen hatphi1=pp1>=pp0 & pp1>=pp2 & pp1>=pp3
+gen hatphi2=pp2>=pp0 & pp2>=pp1 & pp2>=pp3
+gen hatphi3=pp3>=pp0 & pp3>=pp1 & pp3>=pp2
+gen hatphi=0 
+replace hatphi=1 if hatphi1==1
+replace hatphi=2 if hatphi2==1
+replace hatphi=3 if hatphi3==1
+tab phi hatphi
+
 //AME of MNL
-quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 margins, dydx(*) predict(outcome(0)) post
-quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 margins, dydx(*) predict(outcome(1)) post
-quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 margins, dydx(*) predict(outcome(2)) post
-quietly mlogit phi age2039 age4064 age6579 age80 Australia /*
+quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
 margins, dydx(*) predict(outcome(3)) post
+
+
 
 *********************************************************
 ******************Second question*************************
@@ -195,10 +224,9 @@ biprobit (dvisit = age2039 age4064 age6579 age80 Australia /*
 */ age6579 age80 Australia gpvisit /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp)
+///margins, dydx(treat) predict(pmarg1)
 
-//margins, dydx(treat) predict(pmarg1)
-
-
+log close
 
 
 
