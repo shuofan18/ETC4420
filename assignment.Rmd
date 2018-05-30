@@ -83,16 +83,15 @@ LogL &=  \sum_{y=1,T=1}  log\ \Phi_2 [x_{i1}'\beta_1+\delta T_i,\ x_{i2}'\beta_2
 Results of interest: treatment effect of T on y:
 
 $$TE_i=\Phi(x_{i1}'\beta_1+\delta)
--\Phi(x_{i1}'\beta_1)
-$$
+-\Phi(x_{i1}'\beta_1)$$
 
 # Data  
 
 Our data source is the 2004-05 Australian National Health Survey (NHS) which was conducted using a representative sample of the non-institutionalised residential population. The sample design ensured that individuals were randomly selected within each state and territory [@abs2006]. The data we use in this study is a randomly selected subset of 22,000 individuals from this data source.
 
-First we have a look at the dependent variable in the first question that we want to study. The types and proportion of PHI in figure 2. It turns our in our sample almost 50% owns PHI which is consistent with the percentage in the whole population. The second largest group owns "ancillary only" type of insurance. And there are some missing values in the data which we will discuss more in figure \ref{fig:barphi}.
+First we have a look at the dependent variable in the first question that we want to study. The types and proportion of PHI in figure 2. It turns our in our sample almost 50% owns PHI which is consistent with the percentage in the whole population. The second largest group owns "ancillary only" type of insurance. And there are some missing values in the data which we will discuss more in figure 4. In addition, we also plotted the bar plot for dental visits for our second question in figure 3. As we can see, the majority of people have not visited dentists in the past year while the least people have visited twice or more times.
 
-```{r bartype, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Bar plot of the types of insurance people have in Australia", fig.height=4}
+```{r bartype, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Bar plot of the types of insurance people have in Australia", fig.height=3}
 library(foreign)
 library(tidyverse)
 dta <- read.dta("~/downloads/PHI.dta")
@@ -101,18 +100,17 @@ ggplot(dta, aes(Types, fill=Types))+geom_bar()+
   xlab("Types of PHI")+
   theme(axis.text.x=element_blank())
 ```
-In addition, we also plotted the bar plot for dental visits for our second question in figure \ref{fig:barvisit}. As we can see, the majority of people have not visited dentists in the past year while the least people have visited twice or more times.
 
-```{r barvisit, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Bar plot of number of dental visits in the past year.",  fig.height=4}
-colnames(dta)[8] <- "Visits"
-ggplot(dta, aes(Visits, fill=Visits))+geom_bar()+
-  xlab("Number of dental visits")+
-  ggtitle("Bar plot of number of dental visits in the past year.")
+```{r barphi, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Bar plot of number of dental visits in the past year.", fig.height=3}
+dta2 <- read.dta("~/downloads/PHI.dta")
+colnames(dta2)[8] <- "Visits"
+ggplot(dta2, aes(Visits, fill=Visits))+geom_bar()+
+  xlab("Number of dental visits")
 ```
 
-To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years because lack of information for people aged 14 years and below as shown in figure \ref{fig:barphi}. What's more, from the cross tabulation with percentage between age band and types of PHI, we found that there are some consecutive age band having very similar distribution against types of PHI. Hence, we double checked the cross tabulation between original age band with dental visits. It turned out that we will not lose much information by doing re-grouping to the age band according to its behavior. Hence, we re-grouped the age band into six groups as given in the "definition of variables" table below and the first group "age 0-14" will be omitted from all regressions in this study.
+To study the factors may having impact on PHI purchasing, we consider different potential areas, personal demographic, health condition, income and education. Relevant variables in our dataset was defined in table below. After checking the cross tabulation between type of PHI and age band, this study focus on people who are older than 14 years because lack of information for people aged 14 years and below as shown in figure 4. What's more, from the cross tabulation with percentage between age band and types of PHI, we found that there are some consecutive age band having very similar distribution against types of PHI. Hence, we double checked the cross tabulation between original age band with dental visits. It turned out that we will not lose much information by doing re-grouping to the age band according to its behavior. Hence, we re-grouped the age band into six groups as given in the "definition of variables" table below and the first group "age 0-14" will be omitted from all regressions in this study.
 
-```{r barphi, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Histogram of whether having PHI or not based on different age groups.", fig.height=6}
+```{r barphi1, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Histogram of whether having PHI or not based on different age groups."}
 colnames(dta)[13] <- "PHI"
 ggplot(dta, aes(PHI, fill=PHI))+geom_bar()+
   facet_wrap(~agecb)+theme(axis.text.x=element_blank())+
@@ -128,7 +126,8 @@ Since the general health condition is to some extend independent with the dental
 library(gdata)
 library(pander)
 variables <- read.xls("~/documents/github/etc4420/variables.xls", header=T)
-pandoc.table(variables, split.cell = 100, split.table = Inf, caption="Definition of variables", justify='left', keep.line.breaks = TRUE)
+#kable(variables, caption = "Definition of variables")
+pandoc.table(variables, split.cell = 100, split.table = Inf, caption="", justify='left', keep.line.breaks = TRUE)
 ```
 
 # Results
