@@ -1,0 +1,1277 @@
+---------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420\Assignment.log
+  log type:  text
+ opened on:  30 May 2018, 16:12:03
+
+. 
+. use "PHI.dta", replace
+
+. set seed 27886913
+
+. sample 22000, count
+(3,089 observations deleted)
+
+. 
+. *********************************************************
+. ******************First question*************************
+. *********************************************************
+. 
+. //check data summary statistics
+. sum
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    cobcodcb |     22,000    1.339227    .6805015          1          3
+         sex |     22,000    1.533682    .4988756          1          2
+       agecb |     22,000    8.473864    4.461191          1         18
+    mainlanc |     22,000    .8296818    .4954825          0          2
+    edattq1c |     22,000    2.239273    2.096543          0          9
+-------------+---------------------------------------------------------
+    edattqcb |     22,000    3.451636    2.020268          0          7
+    edattpcb |     22,000    3.160727    2.290563          0          9
+    oralq4cb |     22,000    .0709091    .2908816          0          2
+    dntprofc |     22,000    4.416455    1.686676          1          9
+     docq2cb |     22,000    .2495909    .5389715          0          3
+-------------+---------------------------------------------------------
+     docq4cb |     22,000       .0645      .27827          0          2
+    dcclstim |     22,000    2.734955    1.450198          1          9
+    healinq1 |     22,000    1.265682    .8522381          0          9
+     tphimem |     22,000       2.985    2.081077          0          9
+    hicvrtyp |     22,000    3.166318    1.891344          0          9
+-------------+---------------------------------------------------------
+    al2k7day |     22,000    2.041955    1.997638          0          9
+    exmodnoc |     22,000     52.5765    46.35945          0         99
+    exvignoc |     22,000    68.52464    42.83222          0         96
+      extype |     22,000    2.421182    2.224822          0          8
+     exlevel |     22,000    2.736955    1.727949          0          8
+-------------+---------------------------------------------------------
+     bdymsq1 |     22,000    1.430273    1.073444          0          3
+    bmweigcb |     22,000    126.2919    240.9421          0        999
+    bmheighc |     22,000     158.955    142.6572          0        999
+    bmbmicat |     22,000    12.27936     26.0175          0         99
+    smkreglr |     22,000    2.362682    1.633594          0          4
+-------------+---------------------------------------------------------
+    smstatuc |     22,000    2.332273    1.611996          0          4
+      sf12q2 |     22,000    2.040727    1.361906          0          5
+      ltcond |     22,000    1.200545    .4004176          1          2
+     condnoc |     22,000    2.398136     1.83859          0          5
+      sighq2 |     22,000    1.485273    .4997944          1          2
+-------------+---------------------------------------------------------
+         sms |     22,000    1.711409    1.187399          0          3
+    incdecpn |     22,000    26.64045    39.31263          0         99
+    empstabc |     22,000    1.963682    1.507922          0          4
+
+. tab hicvrtyp //tabulation of the dependent variable for 1st question
+
+ Type of private health insurance cover |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                         Not applicable |      3,771       17.14       17.14
+                    Hospital cover only |      1,458        6.63       23.77
+                   Ancillary cover only |        688        3.13       26.90
+      Both hospital and ancillary cover |      6,901       31.37       58.26
+    Insured but type of cover not known |         84        0.38       58.65
+       Without private health insurance |      9,024       41.02       99.66
+Not known if has private health insuran |         74        0.34      100.00
+----------------------------------------+-----------------------------------
+                                  Total |     22,000      100.00
+
+. gen phi=0 if hicvrtyp==5 //without phi
+(12,976 missing values generated)
+
+. replace phi=1 if hicvrtyp==1 //Hospital cover only 
+(1,458 real changes made)
+
+. replace phi=2 if hicvrtyp==2 //Ancillary cover only
+(688 real changes made)
+
+. replace phi=3 if hicvrtyp==3  //Both hospital and ancillary cover
+(6,901 real changes made)
+
+. tab agecb oralq4cb, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+                  |    Number of times consulted
+ Age of person in |  dentist or dental professional
+            years | Not appli          1  2 or more |     Total
+------------------+---------------------------------+----------
+        0-4 years |       871         24          0 |       895 
+                  |     97.32       2.68       0.00 |    100.00 
+------------------+---------------------------------+----------
+        5-9 years |     1,208         97         12 |     1,317 
+                  |     91.72       7.37       0.91 |    100.00 
+------------------+---------------------------------+----------
+      10-14 years |     1,396        145         18 |     1,559 
+                  |     89.54       9.30       1.15 |    100.00 
+------------------+---------------------------------+----------
+      15-19 years |     1,435        101         13 |     1,549 
+                  |     92.64       6.52       0.84 |    100.00 
+------------------+---------------------------------+----------
+      20-24 years |     1,103         53          7 |     1,163 
+                  |     94.84       4.56       0.60 |    100.00 
+------------------+---------------------------------+----------
+      25-29 years |     1,230         49         11 |     1,290 
+                  |     95.35       3.80       0.85 |    100.00 
+------------------+---------------------------------+----------
+      30-34 years |     1,583         71          9 |     1,663 
+                  |     95.19       4.27       0.54 |    100.00 
+------------------+---------------------------------+----------
+      35-39 years |     1,672         68         13 |     1,753 
+                  |     95.38       3.88       0.74 |    100.00 
+------------------+---------------------------------+----------
+      40-44 years |     1,661         90         21 |     1,772 
+                  |     93.74       5.08       1.19 |    100.00 
+------------------+---------------------------------+----------
+      45-49 years |     1,538         70         20 |     1,628 
+                  |     94.47       4.30       1.23 |    100.00 
+------------------+---------------------------------+----------
+      50-54 years |     1,362         74         13 |     1,449 
+                  |     94.00       5.11       0.90 |    100.00 
+------------------+---------------------------------+----------
+      55-59 years |     1,317         76         19 |     1,412 
+                  |     93.27       5.38       1.35 |    100.00 
+------------------+---------------------------------+----------
+      60-64 years |     1,096         69         21 |     1,186 
+                  |     92.41       5.82       1.77 |    100.00 
+------------------+---------------------------------+----------
+      65-69 years |       869         47         10 |       926 
+                  |     93.84       5.08       1.08 |    100.00 
+------------------+---------------------------------+----------
+      70-74 years |       814         46          7 |       867 
+                  |     93.89       5.31       0.81 |    100.00 
+------------------+---------------------------------+----------
+      75-79 years |       681         39          7 |       727 
+                  |     93.67       5.36       0.96 |    100.00 
+------------------+---------------------------------+----------
+      80-84 years |       499         18          2 |       519 
+                  |     96.15       3.47       0.39 |    100.00 
+------------------+---------------------------------+----------
+85 years and over |       311         11          3 |       325 
+                  |     95.69       3.38       0.92 |    100.00 
+------------------+---------------------------------+----------
+            Total |    20,646      1,148        206 |    22,000 
+                  |     93.85       5.22       0.94 |    100.00 
+
+
+. //We can see clear correlation between age and dental visits.
+. tab agecb
+
+ Age of person in |
+            years |      Freq.     Percent        Cum.
+------------------+-----------------------------------
+        0-4 years |        895        4.07        4.07
+        5-9 years |      1,317        5.99       10.05
+      10-14 years |      1,559        7.09       17.14
+      15-19 years |      1,549        7.04       24.18
+      20-24 years |      1,163        5.29       29.47
+      25-29 years |      1,290        5.86       35.33
+      30-34 years |      1,663        7.56       42.89
+      35-39 years |      1,753        7.97       50.86
+      40-44 years |      1,772        8.05       58.91
+      45-49 years |      1,628        7.40       66.31
+      50-54 years |      1,449        6.59       72.90
+      55-59 years |      1,412        6.42       79.32
+      60-64 years |      1,186        5.39       84.71
+      65-69 years |        926        4.21       88.92
+      70-74 years |        867        3.94       92.86
+      75-79 years |        727        3.30       96.16
+      80-84 years |        519        2.36       98.52
+85 years and over |        325        1.48      100.00
+------------------+-----------------------------------
+            Total |     22,000      100.00
+
+. //generate dummy for age groups
+. gen age14=0 //(not applicable 1st question)
+
+. gen age1519=0  //(ref.level 1st question)
+
+. gen age2024=0
+
+. gen age2529=0
+
+. gen age3034=0
+
+. gen age3539=0
+
+. gen age4044=0
+
+. gen age4549=0
+
+. gen age5054=0
+
+. gen age5559=0
+
+. gen age6064=0
+
+. gen age6569=0
+
+. gen age7074=0
+
+. gen age7579=0
+
+. gen age80=0
+
+. replace age14=1 if agecb==1
+(895 real changes made)
+
+. replace age14=1 if agecb==2
+(1,317 real changes made)
+
+. replace age14=1 if agecb==3
+(1,559 real changes made)
+
+. replace age1519=1 if agecb==4
+(1,549 real changes made)
+
+. replace age2024=1 if agecb==5
+(1,163 real changes made)
+
+. replace age2529=1 if agecb==6
+(1,290 real changes made)
+
+. replace age3034=1 if agecb==7
+(1,663 real changes made)
+
+. replace age3539=1 if agecb==8
+(1,753 real changes made)
+
+. replace age4044=1 if agecb==9
+(1,772 real changes made)
+
+. replace age4549=1 if agecb==10
+(1,628 real changes made)
+
+. replace age5054=1 if agecb==11
+(1,449 real changes made)
+
+. replace age5559=1 if agecb==12
+(1,412 real changes made)
+
+. replace age6064=1 if agecb==13
+(1,186 real changes made)
+
+. replace age6569=1 if agecb==14
+(926 real changes made)
+
+. replace age7074=1 if agecb==15
+(867 real changes made)
+
+. replace age7579=1 if agecb==16
+(727 real changes made)
+
+. replace age80=1 if agecb==17
+(519 real changes made)
+
+. replace age80=1 if agecb==18
+(325 real changes made)
+
+. //cross tab indicates age group below 14 is not applicable
+. tab agecb hicvrtyp
+
+ Age of person in |         Type of private health insurance cover
+            years | Not appli  Hospital   Ancillary  Both hosp  Insured b |     Total
+------------------+-------------------------------------------------------+----------
+        0-4 years |       895          0          0          0          0 |       895 
+        5-9 years |     1,317          0          0          0          0 |     1,317 
+      10-14 years |     1,559          0          0          0          0 |     1,559 
+      15-19 years |         0         91         67        601         19 |     1,549 
+      20-24 years |         0         50         39        304         18 |     1,163 
+      25-29 years |         0         45         61        361          5 |     1,290 
+      30-34 years |         0         86         59        589          4 |     1,663 
+      35-39 years |         0        124         72        667          6 |     1,753 
+      40-44 years |         0        138         73        741          6 |     1,772 
+      45-49 years |         0        136         79        689          4 |     1,628 
+      50-54 years |         0        127         60        712          1 |     1,449 
+      55-59 years |         0        138         56        677          2 |     1,412 
+      60-64 years |         0        121         45        514          9 |     1,186 
+      65-69 years |         0         97         26        359          1 |       926 
+      70-74 years |         0         90         31        290          1 |       867 
+      75-79 years |         0        101         16        192          3 |       727 
+      80-84 years |         0         82          3        128          3 |       519 
+85 years and over |         0         32          1         77          2 |       325 
+------------------+-------------------------------------------------------+----------
+            Total |     3,771      1,458        688      6,901         84 |    22,000 
+
+
+                  |    Type of private
+                  |   health insurance
+ Age of person in |         cover
+            years | Without p  Not known |     Total
+------------------+----------------------+----------
+        0-4 years |         0          0 |       895 
+        5-9 years |         0          0 |     1,317 
+      10-14 years |         0          0 |     1,559 
+      15-19 years |       741         30 |     1,549 
+      20-24 years |       742         10 |     1,163 
+      25-29 years |       813          5 |     1,290 
+      30-34 years |       921          4 |     1,663 
+      35-39 years |       880          4 |     1,753 
+      40-44 years |       813          1 |     1,772 
+      45-49 years |       716          4 |     1,628 
+      50-54 years |       547          2 |     1,449 
+      55-59 years |       537          2 |     1,412 
+      60-64 years |       494          3 |     1,186 
+      65-69 years |       440          3 |       926 
+      70-74 years |       454          1 |       867 
+      75-79 years |       414          1 |       727 
+      80-84 years |       301          2 |       519 
+85 years and over |       211          2 |       325 
+------------------+----------------------+----------
+            Total |     9,024         74 |    22,000 
+
+
+. //dummy for gender
+. tab sex
+
+     Sex of |
+     person |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       Male |     10,259       46.63       46.63
+     Female |     11,741       53.37      100.00
+------------+-----------------------------------
+      Total |     22,000      100.00
+
+. gen male=0
+
+. replace male=1 if sex==1
+(10,259 real changes made)
+
+. //dummy for marital status
+. tab sms
+
+           Social Marital Status |      Freq.     Percent        Cum.
+---------------------------------+-----------------------------------
+                  Not applicable |      3,771       17.14       17.14
+Married in a registered marriage |      8,286       37.66       54.80
+   Married in a defacto marriage |        464        2.11       56.91
+                     Not married |      9,479       43.09      100.00
+---------------------------------+-----------------------------------
+                           Total |     22,000      100.00
+
+. gen married=1 if sms==1 //married registered
+(13,714 missing values generated)
+
+. replace married=1 if sms==2 //married de facto
+(464 real changes made)
+
+. replace married=0 if sms==3 //not married (ref.level)
+(9,479 real changes made)
+
+. //dummy for work status
+. tab empstabc 
+
+Full-time/part-time labour force status |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                         Not applicable |      3,771       17.14       17.14
+            Employed, working full-time |      7,333       33.33       50.47
+            Employed, working part-time |      3,599       16.36       66.83
+Unemployed, looking for full-time or pa |        518        2.35       69.19
+                Not in the labour force |      6,779       30.81      100.00
+----------------------------------------+-----------------------------------
+                                  Total |     22,000      100.00
+
+. gen workft=0 
+
+. gen workpt=0
+
+. gen unemp=0
+
+. gen nlf=0  //(ref.level)
+
+. replace workft=1 if empstabc==1 //work full time
+(7,333 real changes made)
+
+. replace workpt=1 if empstabc==2 //work part time
+(3,599 real changes made)
+
+. replace unemp=1 if empstabc==3  //unemployed
+(518 real changes made)
+
+. replace nlf=1 if empstabc==4 //not in labour force
+(6,779 real changes made)
+
+. //dummy for long-term condition
+. tab ltcond
+
+    Whether has long term condition |      Freq.     Percent        Cum.
+------------------------------------+-----------------------------------
+          Has a long term condition |     17,588       79.95       79.95
+Does not have a long term condition |      4,412       20.05      100.00
+------------------------------------+-----------------------------------
+                              Total |     22,000      100.00
+
+. gen longtc=0
+
+. replace longtc=1 if ltcond==1 //has long-term condition
+(17,588 real changes made)
+
+. //dummy for general health assessment
+. tab sf12q2
+
+General health |
+    assessment |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+Not applicable |      3,771       17.14       17.14
+     Excellent |      3,742       17.01       34.15
+     Very good |      6,323       28.74       62.89
+          Good |      5,049       22.95       85.84
+          Fair |      2,214       10.06       95.90
+          Poor |        901        4.10      100.00
+---------------+-----------------------------------
+         Total |     22,000      100.00
+
+. gen excelh=0 
+
+. gen verygood=0
+
+. gen good=0
+
+. gen fair=0
+
+. gen poor=0 //(ref.level)
+
+. replace excelh=1 if sf12q2==1
+(3,742 real changes made)
+
+. replace verygood=1 if sf12q2==2
+(6,323 real changes made)
+
+. replace good=1 if sf12q2==3
+(5,049 real changes made)
+
+. replace fair=1 if sf12q2==4
+(2,214 real changes made)
+
+. replace poor=1 if sf12q2==5  
+(901 real changes made)
+
+. //dummy for educational attainment 
+. tab edattqcb
+
+            Level of highest non-school |
+                          qualification |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                         Not applicable |      3,771       17.14       17.14
+Postgraduate Degree, Graduate Diploma / |        931        4.23       21.37
+                        Bachelor Degree |      2,145        9.75       31.12
+             Advanced Diploma / Diploma |      1,461        6.64       37.76
+                            Certificate |      4,212       19.15       56.91
+            No non-school qualification |      8,354       37.97       94.88
+                   Level not determined |        168        0.76       95.65
+            Not asked (still at school) |        958        4.35      100.00
+----------------------------------------+-----------------------------------
+                                  Total |     22,000      100.00
+
+. gen degree=0
+
+. gen dipcert=0
+
+. gen less12yr=0 //(ref.level)
+
+. replace degree=1 if edattqcb==1
+(931 real changes made)
+
+. replace degree=1 if edattqcb==2
+(2,145 real changes made)
+
+. replace dipcert=1 if edattqcb==3
+(1,461 real changes made)
+
+. replace dipcert=1 if edattqcb==4
+(4,212 real changes made)
+
+. replace less12yr=1 if edattqcb==5
+(8,354 real changes made)
+
+. //generate dummy variable for language spoken at home
+. gen English=0
+
+. gen Australia=0
+
+. gen nonEng=0 //(ref.level)
+
+. replace English=1 if cobcodcb==2
+(2,207 real changes made)
+
+. replace Australia=1 if cobcodcb==1
+(17,165 real changes made)
+
+. replace nonEng=0 if cobcodcb==3
+(0 real changes made)
+
+. //generate dummy variable for income group
+. tab incdecpn
+
+  Gross weekly |
+      personal |
+     income in |
+       deciles |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+Not applicable |      1,036        4.71        4.71
+  First decile |      1,421        6.46       11.17
+ Second decile |      1,377        6.26       17.43
+  Third decile |      2,099        9.54       26.97
+ Fourth decile |      1,754        7.97       34.94
+  Fifth decile |      1,637        7.44       42.38
+  Sixth decile |      1,496        6.80       49.18
+Seventh decile |      1,259        5.72       54.90
+ Eighth decile |      1,512        6.87       61.78
+  Ninth decile |      1,830        8.32       70.10
+  Tenth decile |      1,496        6.80       76.90
+    Not stated |      4,115       18.70       95.60
+     Not known |        968        4.40      100.00
+---------------+-----------------------------------
+         Total |     22,000      100.00
+
+. gen income3=0  //(ref.level)
+
+. gen income4=0
+
+. gen income5=0
+
+. gen income6=0
+
+. gen income7=0
+
+. gen income8=0
+
+. gen income9=0
+
+. gen income10=0
+
+. replace income3=1 if incdecpn==3
+(2,099 real changes made)
+
+. replace income4=1 if incdecpn==4
+(1,754 real changes made)
+
+. replace income5=1 if incdecpn==5
+(1,637 real changes made)
+
+. replace income6=1 if incdecpn==6
+(1,496 real changes made)
+
+. replace income7=1 if incdecpn==7
+(1,259 real changes made)
+
+. replace income8=1 if incdecpn==8
+(1,512 real changes made)
+
+. replace income9=1 if incdecpn==9
+(1,830 real changes made)
+
+. replace income10=1 if incdecpn==10
+(1,496 real changes made)
+
+. //MNL model regression
+. mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+
+Iteration 0:   log likelihood = -18828.359  
+Iteration 1:   log likelihood = -17017.079  
+Iteration 2:   log likelihood = -16990.022  
+Iteration 3:   log likelihood = -16989.565  
+Iteration 4:   log likelihood = -16989.562  
+Iteration 5:   log likelihood = -16989.562  
+
+Multinomial logistic regression                 Number of obs     =     18,071
+                                                LR chi2(102)      =    3677.59
+                                                Prob > chi2       =     0.0000
+Log likelihood = -16989.562                     Pseudo R2         =     0.0977
+
+------------------------------------------------------------------------------
+         phi |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+0            |  (base outcome)
+-------------+----------------------------------------------------------------
+1            |
+     age2024 |  -1.051153   .1940814    -5.42   0.000    -1.431546   -.6707606
+     age2529 |  -1.729235   .2059904    -8.39   0.000    -2.132969   -1.325502
+     age3034 |  -1.299863   .1779623    -7.30   0.000    -1.648662   -.9510629
+     age3539 |  -.8160262   .1671357    -4.88   0.000    -1.143606   -.4884462
+     age4044 |  -.6074847   .1659783    -3.66   0.000    -.9327961   -.2821733
+     age4549 |  -.4479127   .1681588    -2.66   0.008    -.7774979   -.1183276
+     age5054 |  -.1652697   .1713733    -0.96   0.335    -.5011552    .1706157
+     age5559 |   .1138994   .1690288     0.67   0.500     -.217391    .4451898
+     age6064 |    .333262   .1724414     1.93   0.053    -.0047168    .6712409
+     age6569 |   .3668833    .181399     2.02   0.043     .0113478    .7224189
+     age7074 |   .3627607    .184464     1.97   0.049      .001218    .7243035
+     age7579 |   .6362695   .1815901     3.50   0.000     .2803594    .9921796
+       age80 |   .6521319   .1767029     3.69   0.000     .3058005    .9984633
+   Australia |   .1844216    .083171     2.22   0.027     .0214094    .3474337
+     English |  -.2096837   .1156757    -1.81   0.070    -.4364039    .0170365
+        male |  -.3453422   .0643218    -5.37   0.000    -.4714106   -.2192738
+     married |   .6819523   .0638009    10.69   0.000     .5569049    .8069997
+     condnoc |   .0211005   .0214008     0.99   0.324    -.0208442    .0630452
+      excelh |   1.076067   .1666127     6.46   0.000     .7495125    1.402622
+    verygood |   .8329285   .1586588     5.25   0.000      .521963    1.143894
+        good |    .623989   .1574173     3.96   0.000     .3154567    .9325214
+        fair |   .3582159   .1669451     2.15   0.032     .0310095    .6854223
+      degree |    .831223   .0870265     9.55   0.000     .6606543    1.001792
+     dipcert |   .0629917    .070909     0.89   0.374    -.0759873    .2019708
+     income4 |  -.0976788   .1042427    -0.94   0.349    -.3019907    .1066331
+     income5 |   -.062831   .1164126    -0.54   0.589    -.2909955    .1653334
+     income6 |   .0296816   .1251669     0.24   0.813     -.215641    .2750042
+     income7 |   .0713213   .1392393     0.51   0.608    -.2015827    .3442252
+     income8 |   .3154886   .1323533     2.38   0.017     .0560809    .5748962
+     income9 |   .7030523   .1253143     5.61   0.000     .4574409    .9486638
+    income10 |   1.322418   .1395308     9.48   0.000     1.048943    1.595893
+      workft |   .3961789   .1077184     3.68   0.000     .1850547    .6073032
+      workpt |   .3411815   .0986652     3.46   0.001     .1478012    .5345618
+       unemp |  -.8160891   .2839002    -2.87   0.004    -1.372523   -.2596549
+       _cons |  -3.084997   .2120492   -14.55   0.000    -3.500605   -2.669388
+-------------+----------------------------------------------------------------
+2            |
+     age2024 |  -.9764783   .2211734    -4.41   0.000     -1.40997   -.5429863
+     age2529 |  -.8767468   .2085949    -4.20   0.000    -1.285585   -.4679083
+     age3034 |  -1.122673   .2103879    -5.34   0.000    -1.535026   -.7103201
+     age3539 |  -.8675744   .2026505    -4.28   0.000    -1.264762   -.4703867
+     age4044 |  -.8041399   .2038282    -3.95   0.000    -1.203636    -.404644
+     age4549 |  -.5871405   .2035159    -2.88   0.004    -.9860243   -.1882566
+     age5054 |  -.5607453   .2152492    -2.61   0.009    -.9826261   -.1388646
+     age5559 |  -.5413148    .218743    -2.47   0.013    -.9700432   -.1125864
+     age6064 |  -.5073828   .2301727    -2.20   0.027    -.9585131   -.0562526
+     age6569 |  -.8062012   .2673569    -3.02   0.003    -1.330211   -.2821912
+     age7074 |  -.5700914   .2562212    -2.22   0.026    -1.072276   -.0679071
+     age7579 |  -1.093084    .309634    -3.53   0.000    -1.699955   -.4862122
+       age80 |  -2.619447   .5315915    -4.93   0.000    -3.661347   -1.577547
+   Australia |   .0202122   .1174505     0.17   0.863    -.2099866     .250411
+     English |   .2551167   .1486333     1.72   0.086    -.0361992    .5464326
+        male |  -.3517458   .0884731    -3.98   0.000    -.5251498   -.1783418
+     married |   .5460941    .088309     6.18   0.000     .3730116    .7191765
+     condnoc |   .0791797   .0281283     2.81   0.005     .0240493      .13431
+      excelh |   .8962052   .2626165     3.41   0.001     .3814864    1.410924
+    verygood |   .7696629   .2530736     3.04   0.002     .2736477    1.265678
+        good |   .7828947   .2504295     3.13   0.002     .2920619    1.273727
+        fair |   .6097104   .2615526     2.33   0.020     .0970768    1.122344
+      degree |   .3398427   .1298799     2.62   0.009     .0852827    .5944026
+     dipcert |   .1991751   .0923188     2.16   0.031     .0182335    .3801167
+     income4 |  -.2294725   .1568044    -1.46   0.143    -.5368034    .0778584
+     income5 |   .1179691   .1464852     0.81   0.421    -.1691367    .4050748
+     income6 |   .0509797   .1592716     0.32   0.749    -.2611869    .3631463
+     income7 |   .2799012   .1656172     1.69   0.091    -.0447025     .604505
+     income8 |   .1696839    .174052     0.97   0.330    -.1714519    .5108196
+     income9 |   .3117631   .1749593     1.78   0.075    -.0311508    .6546769
+    income10 |   .3396207   .2249732     1.51   0.131    -.1013188    .7805601
+      workft |   .4848987   .1411099     3.44   0.001     .2083284     .761469
+      workpt |   .4498536   .1281719     3.51   0.000     .1986413    .7010659
+       unemp |  -.1007833   .2546207    -0.40   0.692    -.5998306    .3982641
+       _cons |  -3.382093   .3062595   -11.04   0.000     -3.98235   -2.781835
+-------------+----------------------------------------------------------------
+3            |
+     age2024 |  -1.340576   .0981396   -13.66   0.000    -1.532926   -1.148226
+     age2529 |  -1.870298   .1004766   -18.61   0.000    -2.067229   -1.673368
+     age3034 |  -1.606809    .093077   -17.26   0.000    -1.789236   -1.424381
+     age3539 |  -1.368011    .091716   -14.92   0.000    -1.547771   -1.188251
+     age4044 |  -1.177704   .0918778   -12.82   0.000    -1.357781   -.9976269
+     age4549 |  -1.101908   .0945617   -11.65   0.000    -1.287246    -.916571
+     age5054 |  -.7210935   .0969535    -7.44   0.000    -.9111187   -.5310682
+     age5559 |  -.5324642    .097227    -5.48   0.000    -.7230256   -.3419027
+     age6064 |  -.3836237   .1008723    -3.80   0.000    -.5813298   -.1859176
+     age6569 |  -.4084809   .1074819    -3.80   0.000    -.6191415   -.1978202
+     age7074 |  -.5103834    .110508    -4.62   0.000     -.726975   -.2937917
+     age7579 |  -.7475066   .1191673    -6.27   0.000    -.9810703   -.5139429
+       age80 |  -.7872461   .1148597    -6.85   0.000    -1.012367   -.5621252
+   Australia |   .4745834   .0542139     8.75   0.000      .368326    .5808407
+     English |    .143331   .0719719     1.99   0.046     .0022686    .2843934
+        male |  -.3465088   .0387997    -8.93   0.000    -.4225549   -.2704627
+     married |   .7774345     .03878    20.05   0.000     .7014272    .8534419
+     condnoc |   .0833125   .0126965     6.56   0.000     .0584278    .1081973
+      excelh |   1.042241   .1007033    10.35   0.000     .8448659    1.239615
+    verygood |   .8396115   .0956693     8.78   0.000     .6521031     1.02712
+        good |   .6080466   .0949013     6.41   0.000     .4220434    .7940497
+        fair |   .2367255   .1014628     2.33   0.020     .0378619     .435589
+      degree |   .9172322   .0552824    16.59   0.000     .8088807    1.025584
+     dipcert |   .1855022   .0417477     4.44   0.000     .1036783    .2673262
+     income4 |  -.2282014   .0662644    -3.44   0.001    -.3580771   -.0983256
+     income5 |   .0676546   .0675185     1.00   0.316    -.0646793    .1999885
+     income6 |   .0688574   .0734558     0.94   0.349    -.0751134    .2128281
+     income7 |   .1784434   .0803056     2.22   0.026     .0210474    .3358394
+     income8 |   .5876413   .0769264     7.64   0.000     .4368683    .7384142
+     income9 |   .9772425   .0766162    12.76   0.000     .8270776    1.127407
+    income10 |   1.720737   .0911279    18.88   0.000      1.54213    1.899345
+      workft |   .4937974   .0638588     7.73   0.000     .3686365    .6189583
+      workpt |   .5272753    .057652     9.15   0.000     .4142794    .6402712
+       unemp |    -.50701   .1299838    -3.90   0.000    -.7617735   -.2522465
+       _cons |  -1.643994   .1241854   -13.24   0.000    -1.887392   -1.400595
+------------------------------------------------------------------------------
+
+. 
+. quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+
+. predict pp0, outcome(0)
+(option pr assumed; predicted probability)
+(3,771 missing values generated)
+
+. predict pp1, outcome(1)
+(option pr assumed; predicted probability)
+(3,771 missing values generated)
+
+. predict pp2, outcome(2)
+(option pr assumed; predicted probability)
+(3,771 missing values generated)
+
+. predict pp3, outcome(3)
+(option pr assumed; predicted probability)
+(3,771 missing values generated)
+
+. sum pp0 pp1 pp2 pp3 //estimated probabilities
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         pp0 |     18,229    .4998507    .2017459   .0184088   .9495451
+         pp1 |     18,229     .080597    .0373847   .0041954   .2739375
+         pp2 |     18,229    .0380677     .016307    .001621   .1388834
+         pp3 |     18,229    .3814846    .1800484   .0260651   .8637471
+
+. 
+. //hit and loss
+. gen hatphi0=pp0>=pp1 & pp0>=pp2 & pp0>=pp3
+
+. gen hatphi1=pp1>=pp0 & pp1>=pp2 & pp1>=pp3
+
+. gen hatphi2=pp2>=pp0 & pp2>=pp1 & pp2>=pp3
+
+. gen hatphi3=pp3>=pp0 & pp3>=pp1 & pp3>=pp2
+
+. gen hatphi=0 
+
+. replace hatphi=1 if hatphi1==1
+(3,771 real changes made)
+
+. replace hatphi=2 if hatphi2==1
+(3,771 real changes made)
+
+. replace hatphi=3 if hatphi3==1
+(10,401 real changes made)
+
+. tab phi hatphi
+
+           |        hatphi
+       phi |         0          3 |     Total
+-----------+----------------------+----------
+         0 |     7,166      1,858 |     9,024 
+         1 |       781        677 |     1,458 
+         2 |       453        235 |       688 
+         3 |     3,086      3,815 |     6,901 
+-----------+----------------------+----------
+     Total |    11,486      6,585 |    18,071 
+
+
+. 
+. //AME of MNL
+. quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+
+. margins, dydx(*) predict(outcome(0)) post
+
+Average marginal effects                        Number of obs     =     18,071
+Model VCE    : OIM
+
+Expression   : Pr(phi==0), predict(outcome(0))
+dy/dx w.r.t. : age2024 age2529 age3034 age3539 age4044 age4549 age5054 age5559
+               age6064 age6569 age7074 age7579 age80 Australia English male married
+               condnoc excelh verygood good fair degree dipcert income4 income5
+               income6 income7 income8 income9 income10 workft workpt unemp
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age2024 |   .2633635   .0186706    14.11   0.000     .2267698    .2999573
+     age2529 |   .3675905   .0189491    19.40   0.000     .3304509    .4047301
+     age3034 |   .3161851   .0176757    17.89   0.000     .2815414    .3508289
+     age3539 |   .2571772   .0175085    14.69   0.000     .2228611    .2914933
+     age4044 |    .219102    .017691    12.38   0.000     .1844283    .2537757
+     age4549 |   .1975838   .0182316    10.84   0.000     .1618506     .233317
+     age5054 |   .1280901   .0189864     6.75   0.000     .0908774    .1653028
+     age5559 |   .0885933    .019057     4.65   0.000     .0512423    .1259442
+     age6064 |   .0571083   .0197318     2.89   0.004     .0184347     .095782
+     age6569 |   .0654151   .0209447     3.12   0.002     .0243642     .106466
+     age7074 |   .0768618   .0212676     3.61   0.000      .035178    .1185455
+     age7579 |   .1137214   .0225848     5.04   0.000      .069456    .1579868
+       age80 |    .148202   .0232478     6.37   0.000     .1026371    .1937669
+   Australia |   -.080391   .0102366    -7.85   0.000    -.1004544   -.0603275
+     English |   -.019546   .0137634    -1.42   0.156    -.0465217    .0074297
+        male |   .0725759   .0074532     9.74   0.000     .0579679    .0871839
+     married |   -.154925   .0071672   -21.62   0.000    -.1689725   -.1408776
+     condnoc |   -.015143   .0024634    -6.15   0.000    -.0199711   -.0103148
+      excelh |  -.2165625   .0188334   -11.50   0.000    -.2534753   -.1796497
+    verygood |  -.1741541   .0178661    -9.75   0.000    -.2091709   -.1391372
+        good |  -.1311312   .0177418    -7.39   0.000    -.1659046   -.0963579
+        fair |  -.0609284    .018949    -3.22   0.001    -.0980679    -.023789
+      degree |  -.1779685   .0107056   -16.62   0.000     -.198951    -.156986
+     dipcert |    -.03472   .0080461    -4.32   0.000    -.0504901   -.0189499
+     income4 |   .0431362   .0124667     3.46   0.001      .018702    .0675704
+     income5 |  -.0104663   .0129959    -0.81   0.421    -.0359378    .0150052
+     income6 |  -.0126776   .0141564    -0.90   0.370    -.0404235    .0150683
+     income7 |  -.0354524   .0155496    -2.28   0.023    -.0659291   -.0049757
+     income8 |  -.1053825   .0150949    -6.98   0.000     -.134968    -.075797
+     income9 |  -.1821609   .0149758   -12.16   0.000    -.2115129   -.1528089
+    income10 |   -.319795   .0179721   -17.79   0.000    -.3550196   -.2845703
+      workft |  -.0996997   .0122894    -8.11   0.000    -.1237865   -.0756129
+      workpt |  -.1022592   .0110858    -9.22   0.000    -.1239871   -.0805313
+       unemp |    .109421   .0245806     4.45   0.000      .061244    .1575981
+------------------------------------------------------------------------------
+
+. quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+
+. margins, dydx(*) predict(outcome(1)) post
+
+Average marginal effects                        Number of obs     =     18,071
+Model VCE    : OIM
+
+Expression   : Pr(phi==1), predict(outcome(1))
+dy/dx w.r.t. : age2024 age2529 age3034 age3539 age4044 age4549 age5054 age5559
+               age6064 age6569 age7074 age7579 age80 Australia English male married
+               condnoc excelh verygood good fair degree dipcert income4 income5
+               income6 income7 income8 income9 income10 workft workpt unemp
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age2024 |  -.0277086   .0137633    -2.01   0.044    -.0546841   -.0007331
+     age2529 |  -.0591769   .0145394    -4.07   0.000    -.0876737   -.0306801
+     age3034 |  -.0362567   .0124466    -2.91   0.004    -.0606516   -.0118618
+     age3539 |  -.0099695   .0116426    -0.86   0.392    -.0327885    .0128496
+     age4044 |  -.0015021    .011553    -0.13   0.897    -.0241457    .0211414
+     age4549 |   .0068863   .0116902     0.59   0.556    -.0160262    .0297988
+     age5054 |   .0143193   .0118878     1.20   0.228    -.0089804     .037619
+     age5559 |    .028111   .0117333     2.40   0.017     .0051142    .0511078
+     age6064 |   .0388731   .0119889     3.24   0.001     .0153753    .0623709
+     age6569 |   .0430334   .0126687     3.40   0.001     .0182032    .0678637
+     age7074 |   .0455481    .012942     3.52   0.000     .0201822     .070914
+     age7579 |   .0750929   .0128063     5.86   0.000      .049993    .1001928
+       age80 |   .0820079   .0125568     6.53   0.000     .0573971    .1066187
+   Australia |  -.0029135    .005775    -0.50   0.614    -.0142322    .0084052
+     English |  -.0209111   .0080723    -2.59   0.010    -.0367326   -.0050897
+        male |  -.0122353    .004462    -2.74   0.006    -.0209806   -.0034901
+     married |   .0213934   .0043686     4.90   0.000      .012831    .0299558
+     condnoc |  -.0015499    .001482    -1.05   0.296    -.0044546    .0013549
+      excelh |   .0399852   .0118516     3.37   0.001     .0167565    .0632139
+    verygood |   .0296044   .0113526     2.61   0.009     .0073538     .051855
+        good |   .0223023   .0113015     1.97   0.048     .0001517    .0444528
+        fair |   .0161943   .0120274     1.35   0.178    -.0073789    .0397675
+      degree |   .0280565   .0057948     4.84   0.000     .0166989     .039414
+     dipcert |  -.0023517    .004961    -0.47   0.635    -.0120751    .0073717
+     income4 |    .001379   .0073974     0.19   0.852    -.0131195    .0158776
+     income5 |  -.0072329   .0081883    -0.88   0.377    -.0232818    .0088159
+     income6 |  -.0003484   .0087753    -0.04   0.968    -.0175475    .0168508
+     income7 |   -.001736   .0097291    -0.18   0.858    -.0208047    .0173327
+     income8 |    .002317   .0091128     0.25   0.799    -.0155438    .0201777
+     income9 |   .0167512    .008452     1.98   0.047     .0001856    .0333168
+    income10 |   .0362468   .0089665     4.04   0.000     .0186728    .0538209
+      workft |   .0104999   .0074841     1.40   0.161    -.0041686    .0251684
+      workpt |   .0054501   .0068606     0.79   0.427    -.0079964    .0188965
+       unemp |  -.0417134   .0206058    -2.02   0.043       -.0821   -.0013268
+------------------------------------------------------------------------------
+
+. quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+
+. margins, dydx(*) predict(outcome(2)) post
+
+Average marginal effects                        Number of obs     =     18,071
+Model VCE    : OIM
+
+Expression   : Pr(phi==2), predict(outcome(2))
+dy/dx w.r.t. : age2024 age2529 age3034 age3539 age4044 age4549 age5054 age5559
+               age6064 age6569 age7074 age7579 age80 Australia English male married
+               condnoc excelh verygood good fair degree dipcert income4 income5
+               income6 income7 income8 income9 income10 workft workpt unemp
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age2024 |   -.012975   .0078623    -1.65   0.099    -.0283849    .0024349
+     age2529 |   .0003089   .0072923     0.04   0.966    -.0139837    .0146016
+     age3034 |  -.0137014    .007405    -1.85   0.064    -.0282149    .0008122
+     age3539 |   -.009294   .0071391    -1.30   0.193    -.0232865    .0046984
+     age4044 |  -.0103565   .0071964    -1.44   0.150    -.0244612    .0037482
+     age4549 |  -.0040293   .0071752    -0.56   0.574    -.0180924    .0100337
+     age5054 |  -.0094227   .0076152    -1.24   0.216    -.0243481    .0055028
+     age5559 |  -.0122641   .0077541    -1.58   0.114    -.0274619    .0029337
+     age6064 |  -.0138272   .0081771    -1.69   0.091     -.029854    .0021996
+     age6569 |  -.0244265   .0095736    -2.55   0.011    -.0431905   -.0056625
+     age7074 |  -.0143484   .0091474    -1.57   0.117    -.0322769    .0035801
+     age7579 |  -.0307017   .0111439    -2.76   0.006    -.0525433   -.0088601
+       age80 |  -.0856624   .0194592    -4.40   0.000    -.1238016   -.0475231
+   Australia |   -.006699   .0041823    -1.60   0.109    -.0148961    .0014982
+     English |   .0077946   .0052907     1.47   0.141     -.002575    .0181642
+        male |  -.0067535   .0031481    -2.15   0.032    -.0129237   -.0005833
+     married |    .006582   .0030884     2.13   0.033     .0005289    .0126351
+     condnoc |   .0016062   .0009996     1.61   0.108    -.0003531    .0035654
+      excelh |   .0143238   .0094438     1.52   0.129    -.0041856    .0328333
+    verygood |   .0133708   .0091273     1.46   0.143    -.0045183    .0312599
+        good |   .0178218   .0090583     1.97   0.049     .0000678    .0355758
+        fair |   .0176918   .0094764     1.87   0.062    -.0008816    .0362652
+      degree |  -.0033799   .0045257    -0.75   0.455    -.0122501    .0054903
+     dipcert |   .0043618    .003292     1.32   0.185    -.0020903    .0108139
+     income4 |  -.0047423   .0056347    -0.84   0.400    -.0157861    .0063014
+     income5 |    .003486   .0052271     0.67   0.505    -.0067589    .0137308
+     income6 |   .0007664   .0056794     0.13   0.893    -.0103649    .0118978
+     income7 |   .0073754   .0058831     1.25   0.210    -.0041554    .0189061
+     income8 |  -.0032867   .0061546    -0.53   0.593    -.0153495    .0087761
+     income9 |  -.0049043   .0061295    -0.80   0.424    -.0169179    .0071094
+    income10 |  -.0164895   .0077994    -2.11   0.034     -.031776    -.001203
+      workft |   .0093058   .0050232     1.85   0.064    -.0005396    .0191511
+      workpt |   .0077032   .0045557     1.69   0.091    -.0012257    .0166321
+       unemp |   .0060612    .009238     0.66   0.512     -.012045    .0241674
+------------------------------------------------------------------------------
+
+. quietly mlogit phi age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp
+
+. margins, dydx(*) predict(outcome(3)) post
+
+Average marginal effects                        Number of obs     =     18,071
+Model VCE    : OIM
+
+Expression   : Pr(phi==3), predict(outcome(3))
+dy/dx w.r.t. : age2024 age2529 age3034 age3539 age4044 age4549 age5054 age5559
+               age6064 age6569 age7074 age7579 age80 Australia English male married
+               condnoc excelh verygood good fair degree dipcert income4 income5
+               income6 income7 income8 income9 income10 workft workpt unemp
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     age2024 |    -.22268   .0193094   -11.53   0.000    -.2605257   -.1848343
+     age2529 |  -.3087225   .0194507   -15.87   0.000    -.3468452   -.2705998
+     age3034 |  -.2662271   .0178272   -14.93   0.000    -.3011677   -.2312864
+     age3539 |  -.2379137   .0175117   -13.59   0.000     -.272236   -.2035914
+     age4044 |  -.2072433   .0175477   -11.81   0.000    -.2416362   -.1728505
+     age4549 |  -.2004408   .0180285   -11.12   0.000    -.2357759   -.1651056
+     age5054 |  -.1329867   .0184678    -7.20   0.000    -.1691829   -.0967905
+     age5559 |  -.1044402   .0185412    -5.63   0.000    -.1407804      -.0681
+     age6064 |  -.0821542   .0192849    -4.26   0.000    -.1199519   -.0443565
+     age6569 |   -.084022   .0207374    -4.05   0.000    -.1246666   -.0433774
+     age7074 |  -.1080615   .0213994    -5.05   0.000    -.1500036   -.0661194
+     age7579 |  -.1581126   .0232181    -6.81   0.000    -.2036193   -.1126059
+       age80 |  -.1445475   .0233424    -6.19   0.000    -.1902978   -.0987972
+   Australia |   .0900034   .0103903     8.66   0.000     .0696389     .110368
+     English |   .0326625   .0138478     2.36   0.018     .0055213    .0598037
+        male |  -.0535871   .0074147    -7.23   0.000    -.0681196   -.0390545
+     married |   .1269497   .0072294    17.56   0.000     .1127804     .141119
+     condnoc |   .0150867   .0024216     6.23   0.000     .0103404    .0198329
+      excelh |   .1622535   .0199123     8.15   0.000     .1232261    .2012809
+    verygood |   .1311788   .0190858     6.87   0.000     .0937714    .1685862
+        good |   .0910071   .0190301     4.78   0.000     .0537088    .1283054
+        fair |   .0270423   .0204217     1.32   0.185    -.0129834    .0670681
+      degree |   .1532919   .0100236    15.29   0.000      .133646    .1729378
+     dipcert |   .0327099   .0080703     4.05   0.000     .0168924    .0485274
+     income4 |  -.0397729    .013042    -3.05   0.002    -.0653347   -.0142111
+     income5 |   .0142133   .0131369     1.08   0.279    -.0115346    .0399611
+     income6 |   .0122595   .0142418     0.86   0.389    -.0156539     .040173
+     income7 |    .029813   .0154798     1.93   0.054    -.0005268    .0601528
+     income8 |   .1063522   .0145436     7.31   0.000     .0778473     .134857
+     income9 |    .170314   .0141114    12.07   0.000     .1426561    .1979719
+    income10 |   .3000376   .0159098    18.86   0.000      .268855    .3312202
+      workft |    .079894   .0122434     6.53   0.000     .0558974    .1038907
+      workpt |   .0891059   .0110524     8.06   0.000     .0674435    .1107683
+       unemp |  -.0737689   .0269571    -2.74   0.006    -.1266039   -.0209339
+------------------------------------------------------------------------------
+
+. 
+. 
+. 
+. *********************************************************
+. ******************Second question*************************
+. *********************************************************
+. 
+. 
+. tab oralq4cb //check the dependent variable for second question
+
+     Number of |
+         times |
+     consulted |
+    dentist or |
+        dental |
+  professional |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+Not applicable |     20,646       93.85       93.85
+             1 |      1,148        5.22       99.06
+     2 or more |        206        0.94      100.00
+---------------+-----------------------------------
+         Total |     22,000      100.00
+
+. //create dummy variable as dependent variable
+. gen dvisit=0
+
+. replace dvisit=1 if oralq4cb==1
+(1,148 real changes made)
+
+. replace dvisit=1 if oralq4cb==2
+(206 real changes made)
+
+. tab healinq1 //check the treatment variable 
+
+    Whether currently covered by |
+        private health insurance |      Freq.     Percent        Cum.
+---------------------------------+-----------------------------------
+                  Not applicable |      3,771       17.14       17.14
+   With private health insurance |      9,131       41.50       58.65
+Without private health insurance |      9,024       41.02       99.66
+                       Not known |         74        0.34      100.00
+---------------------------------+-----------------------------------
+                           Total |     22,000      100.00
+
+. //create dummy variable for treatment 
+. gen treat=0 if  healinq1==2
+(12,976 missing values generated)
+
+. replace treat=1 if  healinq1==1
+(9,131 real changes made)
+
+. 
+. //create dummy for smoking
+. tab smkreglr
+
+                  Regular smoker status |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                         Not applicable |      4,893       22.24       22.24
+      Current regular (ie daily) smoker |      3,721       16.91       39.15
+Current smoker, not regular (less than  |        311        1.41       40.57
+                    Ex (regular) smoker |      4,664       21.20       61.77
+ Not current and never smoked regularly |      8,411       38.23      100.00
+----------------------------------------+-----------------------------------
+                                  Total |     22,000      100.00
+
+. gen nonsmoke=0  //(ref.level)
+
+. gen exsmoke=0
+
+. gen currentsmk=0
+
+. gen regularsmk=0
+
+. replace nonsmoke=1 if smkreglr==4
+(8,411 real changes made)
+
+. replace exsmoke=1 if smkreglr==3
+(4,664 real changes made)
+
+. replace currentsmk=1 if smkreglr==2
+(311 real changes made)
+
+. replace regularsmk=1 if smkreglr==1
+(3,721 real changes made)
+
+. //create dummy for drinking 
+. tab al2k7day
+
+ Alcohol risk level 7 day average (2000 |
+                            guidelines) |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                         Not applicable |      4,893       22.24       22.24
+                               Low risk |      8,329       37.86       60.10
+                            Medium risk |      1,361        6.19       66.29
+                              High risk |        942        4.28       70.57
+Last consumed alcohol 1 week to less th |      3,632       16.51       87.08
+Last consumed alcohol 12 months or more |      1,227        5.58       92.65
+                 Never consumed alcohol |      1,387        6.30       98.96
+Time since last consumed alcohol not kn |        229        1.04      100.00
+----------------------------------------+-----------------------------------
+                                  Total |     22,000      100.00
+
+. gen low=0 //(ref.level)
+
+. gen medium=0
+
+. gen high=0
+
+. replace low=1 if al2k7day==1
+(8,329 real changes made)
+
+. replace low=1 if al2k7day==5
+(1,227 real changes made)
+
+. replace low=1 if al2k7day==6
+(1,387 real changes made)
+
+. replace medium=1 if al2k7day==2
+(1,361 real changes made)
+
+. replace high=1 if al2k7day==4
+(3,632 real changes made)
+
+. //create "times visited GP" variable
+. tab docq2cb
+
+     Number of |
+         times |
+     consulted |
+       general |
+  practitioner |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+Not applicable |     17,469       79.40       79.40
+             1 |      3,746       17.03       96.43
+             2 |        610        2.77       99.20
+     3 or more |        175        0.80      100.00
+---------------+-----------------------------------
+         Total |     22,000      100.00
+
+. gen gpvisit=docq2cb
+
+. 
+. /////estimate EBVP model 
+> 
+. biprobit (dvisit = age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp/*
+> */ exsmoke currentsmk regularsmk medium low treat) (treat = age2024 age2529/*
+> */ age3034 age3539 age4044 age4549 age5054 /*
+> */age5559 age6064 age6569 age7074 age7579 age80 Australia gpvisit /*
+> */English male married condno excelh verygood good fair degree dipcert /*
+> */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp)
+
+Fitting comparison equation 1:
+
+Iteration 0:   log likelihood = -4022.8514  
+Iteration 1:   log likelihood = -3938.2169  
+Iteration 2:   log likelihood = -3937.3505  
+Iteration 3:   log likelihood = -3937.3503  
+
+Fitting comparison equation 2:
+
+Iteration 0:   log likelihood = -12583.772  
+Iteration 1:   log likelihood = -11012.142  
+Iteration 2:   log likelihood = -11007.503  
+Iteration 3:   log likelihood = -11007.501  
+Iteration 4:   log likelihood = -11007.501  
+
+Comparison:    log likelihood = -14944.851
+
+Fitting full model:
+
+Iteration 0:   log likelihood = -14944.851  
+Iteration 1:   log likelihood = -14944.824  
+Iteration 2:   log likelihood =  -14944.82  
+Iteration 3:   log likelihood =  -14944.82  
+
+Seemingly unrelated bivariate probit            Number of obs     =     18,155
+                                                Wald chi2(75)     =    2849.86
+Log likelihood =  -14944.82                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+dvisit       |
+     age2024 |  -.1373693   .1324038    -1.04   0.300    -.3968761    .1221374
+     age2529 |  -.2395698   .1627607    -1.47   0.141    -.5585748    .0794353
+     age3034 |   -.255216   .1472801    -1.73   0.083    -.5438798    .0334478
+     age3539 |  -.3070765   .1304625    -2.35   0.019    -.5627784   -.0513747
+     age4044 |  -.1850155   .1179805    -1.57   0.117    -.4162531    .0462221
+     age4549 |  -.2673813   .1153376    -2.32   0.020    -.4934388   -.0413238
+     age5054 |  -.2601708   .1022002    -2.55   0.011    -.4604794   -.0598621
+     age5559 |  -.2187866   .0937965    -2.33   0.020    -.4026244   -.0349488
+     age6064 |  -.1720233    .091287    -1.88   0.060    -.3509424    .0068958
+     age6569 |  -.2813678   .1011733    -2.78   0.005    -.4796637   -.0830718
+     age7074 |  -.2785102   .1040264    -2.68   0.007    -.4823983   -.0746222
+     age7579 |  -.2445335   .1108929    -2.21   0.027    -.4618796   -.0271875
+       age80 |  -.4432284   .1170965    -3.79   0.000    -.6727333   -.2137234
+   Australia |  -.0934308   .0528861    -1.77   0.077    -.1970857    .0102241
+     English |   .0283729   .0590889     0.48   0.631    -.0874392    .1441851
+        male |  -.1094434   .0433775    -2.52   0.012    -.1944616   -.0244251
+     married |    .036231   .0681113     0.53   0.595    -.0972648    .1697267
+     condnoc |   .0332255   .0126055     2.64   0.008     .0085191    .0579318
+      excelh |   .0736935   .1185486     0.62   0.534    -.1586575    .3060445
+    verygood |    .016436   .1049142     0.16   0.876     -.189192     .222064
+        good |   .0368958   .0938559     0.39   0.694    -.1470584    .2208499
+        fair |   .0561672   .0866837     0.65   0.517    -.1137297     .226064
+      degree |   .0809402   .0798549     1.01   0.311    -.0755725    .2374529
+     dipcert |   .0190292   .0395854     0.48   0.631    -.0585568    .0966152
+     income4 |  -.0728981   .0602515    -1.21   0.226    -.1909889    .0451926
+     income5 |  -.0176677    .059254    -0.30   0.766    -.1338033     .098468
+     income6 |   .0125575   .0647003     0.19   0.846    -.1142527    .1393677
+     income7 |    .008897   .0732854     0.12   0.903    -.1347398    .1525337
+     income8 |  -.0405054   .0811722    -0.50   0.618    -.1995999    .1185891
+     income9 |     .06307   .0965618     0.65   0.514    -.1261876    .2523276
+    income10 |   .0558065   .1325499     0.42   0.674    -.2039865    .3155995
+      workft |  -.1139117   .0664065    -1.72   0.086     -.244066    .0162426
+      workpt |   -.038335    .062793    -0.61   0.542    -.1614069     .084737
+       unemp |   .0463123    .102063     0.45   0.650    -.1537276    .2463522
+     exsmoke |   .0727025   .0377108     1.93   0.054    -.0012093    .1466144
+  currentsmk |   .2409847   .1079151     2.23   0.026     .0294749    .4524945
+  regularsmk |  -.0311241   .0457677    -0.68   0.496    -.1208271    .0585789
+      medium |   .0585612   .0611789     0.96   0.338    -.0613472    .1784696
+         low |  -.0136301   .0355123    -0.38   0.701    -.0832329    .0559727
+       treat |   .3209288   .3771742     0.85   0.395     -.418319    1.060177
+       _cons |  -1.544676   .1286216   -12.01   0.000     -1.79677   -1.292582
+-------------+----------------------------------------------------------------
+treat        |
+     age2024 |  -.7276231    .053478   -13.61   0.000     -.832438   -.6228082
+     age2529 |  -1.032894   .0553148   -18.67   0.000    -1.141309   -.9244792
+     age3034 |  -.9077093   .0520869   -17.43   0.000    -1.009798   -.8056208
+     age3539 |  -.7441347   .0515078   -14.45   0.000    -.8450882   -.6431811
+     age4044 |  -.6379035   .0517646   -12.32   0.000    -.7393602   -.5364468
+     age4549 |   -.573243   .0532131   -10.77   0.000    -.6775388   -.4689472
+     age5054 |  -.3803817   .0549862    -6.92   0.000    -.4881527   -.2726106
+     age5559 |  -.2675786    .055059    -4.86   0.000    -.3754924   -.1596649
+     age6064 |  -.1687383   .0570865    -2.96   0.003    -.2806257   -.0568509
+     age6569 |  -.1982321   .0608895    -3.26   0.001    -.3175733   -.0788908
+     age7074 |  -.2293851   .0618217    -3.71   0.000    -.3505534   -.1082167
+     age7579 |  -.2995815   .0647687    -4.63   0.000    -.4265259   -.1726371
+       age80 |  -.3341401   .0623427    -5.36   0.000    -.4563295   -.2119508
+   Australia |   .2154716   .0293513     7.34   0.000     .1579442    .2729991
+     gpvisit |  -.0136166   .0191258    -0.71   0.476    -.0511026    .0238694
+     English |   .0443396   .0394708     1.12   0.261    -.0330218    .1217009
+        male |  -.2002843   .0216464    -9.25   0.000    -.2427105   -.1578581
+     married |   .4414329   .0216298    20.41   0.000     .3990392    .4838265
+     condnoc |    .045422   .0071728     6.33   0.000     .0313635    .0594805
+      excelh |    .617984    .054602    11.32   0.000     .5109661    .7250019
+    verygood |   .4978914   .0515772     9.65   0.000     .3968019     .598981
+        good |   .3707651   .0508831     7.29   0.000      .271036    .4704941
+        fair |   .1659735    .053915     3.08   0.002      .060302     .271645
+      degree |   .5098509   .0311862    16.35   0.000      .448727    .5709748
+     dipcert |   .1003503   .0233876     4.29   0.000     .0545114    .1461892
+     income4 |   -.125627   .0360448    -3.49   0.000    -.1962735   -.0549804
+     income5 |   .0254537   .0377282     0.67   0.500    -.0484922    .0993996
+     income6 |   .0280471   .0411497     0.68   0.495    -.0526048     .108699
+     income7 |   .0940847    .045062     2.09   0.037     .0057647    .1824047
+     income8 |   .2974694   .0440287     6.76   0.000     .2111748     .383764
+     income9 |   .5215958   .0434592    12.00   0.000     .4364174    .6067742
+    income10 |   .9285324   .0506567    18.33   0.000      .829247    1.027818
+      workft |   .2846378    .035753     7.96   0.000     .2145631    .3547125
+      workpt |   .2976681   .0324512     9.17   0.000     .2340648    .3612713
+       unemp |  -.3015131   .0675681    -4.46   0.000    -.4339442   -.1690821
+       _cons |  -.7494537   .0681626   -11.00   0.000      -.88305   -.6158575
+-------------+----------------------------------------------------------------
+     /athrho |  -.0573507   .2303185    -0.25   0.803    -.5087666    .3940653
+-------------+----------------------------------------------------------------
+         rho |  -.0572879   .2295626                     -.4689836    .3748596
+------------------------------------------------------------------------------
+LR test of rho=0: chi2(1) = .062727                       Prob > chi2 = 0.8022
+
+. ///margins, dydx(treat) predict(pmarg1)
+> 
+. log close
+      name:  <unnamed>
+       log:  \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420\Assignment.log
+  log type:  text
+ closed on:  30 May 2018, 16:17:29
+---------------------------------------------------------------------------------------
