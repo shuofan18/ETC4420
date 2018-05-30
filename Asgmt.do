@@ -1,9 +1,9 @@
 clear
-cd /Users/stanza/Downloads
+//cd /Users/stanza/Downloads
 set more off
 capture log close
 log using Assignment.log,replace
-//cd \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420
+cd \\ad.monash.edu\home\User079\szha0076\Desktop\ETC4420
 use "PHI.dta", replace
 set seed 27886913
 sample 22000, count
@@ -217,11 +217,16 @@ replace high=1 if al2k7day==4
 //create "times visited GP" variable
 tab docq2cb
 gen gpvisit=docq2cb
-biprobit (dvisit = age2039 age4064 age6579 age80 Australia /*
+
+/////estimate EBVP model 
+
+biprobit (dvisit = age2024 age2529 age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp/*
-*/ exsmoke currentsmk regularsmk medium low treat) (treat = age2039 age4064/* 
-*/ age6579 age80 Australia gpvisit /*
+*/ exsmoke currentsmk regularsmk medium low treat) (treat = age2024 age2529/*
+*/ age3034 age3539 age4044 age4549 age5054 /*
+*/age5559 age6064 age6569 age7074 age7579 age80 Australia gpvisit /*
 */English male married condno excelh verygood good fair degree dipcert /*
 */income4 income5 income6 income7 income8 income9 income10 workft workpt unemp)
 ///margins, dydx(treat) predict(pmarg1)
